@@ -1,0 +1,100 @@
+issues:
+      exclude-use-default: false
+      exclude-case-sensitive: false
+      max-issues-per-linter: 5000
+      max-same-issues: 5000
+      new: false
+run:
+      timeout: "1m"
+      issue-exit-code: 1
+      tests: true
+      skip-dirs-use-default: true
+      allow-parallel-runners: true
+      go: "1.18"
+      concurrency: 16
+      skip-dirs:
+            - "internal/repositories/persistence/models"
+            - "internal/auth"
+severity:
+      default-severity: error
+      case-sensitive: false
+linters-settings:
+      cyclop:
+            max-complexity: 500
+            package-average: 100
+            skip-tests: true
+      godox:
+            keywords:
+                  - NOTE
+      gomoddirectives:
+            # Allow local `replace` directives.
+            # Default: false
+            replace-local: true
+            # List of allowed `replace` directives.
+            # Default: []
+            replace-allow-list:
+            # Allow to not explain why the version has been retracted in the `retract` directives.
+            # Default: false
+            retract-allow-no-explanation: false
+            # Forbid the use of the `exclude` directives.
+            # Default: false
+            exclude-forbidden: false
+linters:
+      disable-all: true
+      enable-all: false
+      fast: true
+      # disable:
+      enable:
+            # - gosec
+            - makezero
+            # - gci
+            - gocritic
+            - errorlint
+            - exhaustive
+            - cyclop
+            - dupl
+            - gomoddirectives
+            - typecheck
+            - asasalint
+            - asciicheck
+            - bidichk
+            - bodyclose
+            - containedctx
+            - contextcheck
+            - decorder
+            - dupword
+            - durationcheck
+            - errcheck
+            - errchkjson
+            - errname
+            - exportloopref
+            - godox
+            - gofmt
+            - gofumpt
+            - goheader
+            - goimports
+            - goprintffuncname
+            - gosimple
+            - govet
+            - grouper
+            - importas
+            - ineffassign
+            - loggercheck
+            - misspell
+            - nakedret
+            - noctx
+            - nolintlint
+            - nosprintfhostport
+            - prealloc
+            - promlinter
+            - reassign
+            - staticcheck
+            - tenv
+            - testableexamples
+            - testpackage
+            - tparallel
+            - unconvert
+            - unparam
+            - unused
+            - usestdlibvars
+            - whitespace

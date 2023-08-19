@@ -1,0 +1,31 @@
+version: "2.2"
+
+services:
+      # docker container exec -it pg-im-test bash -c 'PGPASSWORD=mamadspass psql -U mamad -h 30.0.0.10 mamad_db'
+      pg-im-test:
+            image: postgres:14.1
+            container_name: pg-im-test
+            restart: always
+            expose:
+                  - 5432
+            environment:
+                  - POSTGRES_USER=mamad
+                  - POSTGRES_PASSWORD=mamadspass
+                  - POSTGRES_DB=mamad_db
+            networks:
+                  service_dependency_net:
+                        ipv4_address: 30.0.0.10
+            volumes:
+                  - /dev/shm/pg-im-test:/var/lib/postgresql/data
+            healthcheck:
+                  test: ["CMD-SHELL", "sh -c 'pg_isready -U mamad -d mamad_db'"]
+                  interval: 10s
+                  timeout: 3s
+                  retries: 3
+networks:
+      service_dependency_net:
+            driver: bridge
+            name: pg_im_test_dependency_net
+            ipam:
+                  config:
+                        - subnet: 30.0.0.0/24
