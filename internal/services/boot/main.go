@@ -2,13 +2,13 @@ package boot
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/mreza0100/gptjarvis/internal/models"
 	"github.com/mreza0100/gptjarvis/internal/ports/chatport"
 	"github.com/mreza0100/gptjarvis/internal/ports/historyport"
 	"github.com/mreza0100/gptjarvis/internal/ports/interactorport"
 	"github.com/mreza0100/gptjarvis/internal/ports/runnerport"
+	modelstore "github.com/mreza0100/gptjarvis/models"
 
 	openai "github.com/sashabaranov/go-openai"
 
@@ -37,15 +37,15 @@ func NewBootSrv(req *srvport.ServicesReq) srvport.BootService {
 	}
 }
 
-func (b *boot) initLLMRole() (*models.Response, error) {
-	roleDescription, err := os.ReadFile("./configs/jarvis.gpt")
+func (b *boot) initLLMRole(modelName string) (*models.Response, error) {
+	content, err := modelstore.ModelsFS.ReadFile(modelName)
 	if err != nil {
 		return nil, err
 	}
-	roleDescriptionStr := string(roleDescription)
+	modelDescriptor := string(content)
 
 	prompt := &models.Prompt{
-		ClientPrompt: &roleDescriptionStr,
+		ClientPrompt: &modelDescriptor,
 	}
 	b.history.SavePrompt(prompt)
 	response, err := b.chat.Prompt(prompt)
@@ -87,11 +87,11 @@ func (b *boot) runScript(response *models.Response) (*models.ScriptResult, error
 	return scriptResults, nil
 }
 
-func (b *boot) Start() (err error) {
+func (b *boot) Start(modelName string) (err error) {
 	defer func() {
 		fmt.Println("Start Defer, err:", err)
 	}()
-	response, err := b.initLLMRole()
+	response, err := b.initLLMRole(modelName)
 	if err != nil {
 		return err
 	}

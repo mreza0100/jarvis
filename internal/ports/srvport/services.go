@@ -19,5 +19,5 @@ type Services struct {
 }
 
 type BootService interface {
-	Start() error
+	Start(modelName string) error
 }

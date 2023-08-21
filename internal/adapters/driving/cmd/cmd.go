@@ -21,7 +21,7 @@ func NewCMDHandler(params *CmdHandlerParams) cmdport.CMD {
 }
 
 func (c *cmd) Boot(ctx *cli.Context) error {
-	err := c.srv.BootService.Start()
+	err := c.srv.BootService.Start("jarvis.gpt")
 	if err != nil {
 		return err
 	}
