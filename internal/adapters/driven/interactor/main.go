@@ -16,10 +16,11 @@ import (
 )
 
 type interactor struct {
+	mode models.Mode
+
 	stdin  io.Reader
 	stdout io.Writer
 	stderr io.Writer
-	mode   models.Mode
 }
 
 type InteractorArg struct {
@@ -32,10 +33,11 @@ type InteractorArg struct {
 
 func NewInteractor(args InteractorArg) interactorport.Interactor {
 	return &interactor{
+		mode: args.CfgProvider.GetCfg().Mode,
+
 		stdin:  args.Stdin,
 		stdout: args.Stdout,
 		stderr: args.Stderr,
-		mode:   args.CfgProvider.GetCfg().Mode,
 	}
 }
 

@@ -2,33 +2,18 @@ package runner
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"os/exec"
 	"strings"
 	"syscall"
 
-	"github.com/gofrs/uuid"
 	"github.com/mreza0100/gptjarvis/internal/models"
 	"github.com/mreza0100/gptjarvis/internal/ports/runnerport"
 )
 
-type runner struct {
-	conversationID string
-	rootDir        string
-}
+type runner struct{}
 
 func NewRunner() runnerport.Runner {
-	conversationID, err := uuid.NewV4()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(conversationID.String())
-	return &runner{
-		conversationID: conversationID.String(),
-		rootDir:        "/home/mamzi/works/gpt-jarvis/tmp",
-	}
+	return &runner{}
 }
 
 func (r *runner) ExecuteScript(request *models.ScriptRequest) (string, uint8, error) {

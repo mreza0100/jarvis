@@ -11,7 +11,7 @@ import (
 type mode int8
 
 const (
-	AppendMode = iota + 1
+	AppendMode mode = iota + 1
 	TruncMode
 	CreateMode
 	ReadMode
@@ -25,13 +25,6 @@ var modeSets = map[mode]int{
 	ReadCreateMode: os.O_RDONLY | os.O_CREATE,
 	ReadMode:       os.O_RDONLY,
 }
-
-var (
-	Stdout      = os.Stdout
-	Stderr      = os.Stderr
-	Getenv      = os.Getenv
-	UserHomeDir = os.UserHomeDir
-)
 
 func FileExists(path string) bool {
 	_, err := os.Stat(path)
@@ -54,8 +47,4 @@ func OpenFile(p string, m mode) (*os.File, error) {
 	}
 
 	return os.OpenFile(filepath.Clean(p), modeSets[m], 0o600)
-}
-
-func RemoveDir(p string) error {
-	return os.RemoveAll(p)
 }

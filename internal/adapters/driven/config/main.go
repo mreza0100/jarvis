@@ -18,6 +18,7 @@ var loadedConfigs *models.Configuration
 const (
 	configDirName  = ".jarvis"
 	configFileName = "config.json"
+	historyDirName = "history"
 )
 
 type configs struct {
@@ -30,8 +31,9 @@ func NewConfigProvider() cfgport.CfgProvider {
 	}
 
 	cfg := &configs{cfg: &models.Configuration{}}
-	cfg.setConfigFromEnvVars()
-	cfg.setConfigFromConfigDir()
+	cfg.setEnvConfigs()
+	cfg.setSavedConfigs()
+	cfg.setConstantConfigs()
 	return cfg
 }
 
@@ -39,11 +41,18 @@ func (c *configs) GetCfg() *models.Configuration {
 	return c.cfg
 }
 
-func (c *configs) setConfigFromEnvVars() {
+func (c *configs) setEnvConfigs() {
 	c.cfg.Mode = getModeFromEnv("MODE")
 }
 
-func (c *configs) setConfigFromConfigDir() {
+func (c *configs) setConstantConfigs() {
+	c.cfg.ConstantConfigs = &models.ConstantConfigs{
+		RootDirPath:    configDirName,
+		HistoryDirName: historyDirName,
+	}
+}
+
+func (c *configs) setSavedConfigs() {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -65,6 +74,7 @@ func (c *configs) setConfigFromConfigDir() {
 	}
 	content := string(rawContent)
 	if content == "" {
+		// TODO: Marshal savedConfigs and write it instead of {}
 		content = "{}"
 		cfgF, err := os.OpenFile(path.Join(jarvisDir, configFileName), os.AppendMode)
 		if err != nil {

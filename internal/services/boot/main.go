@@ -6,6 +6,7 @@ import (
 
 	"github.com/mreza0100/gptjarvis/internal/models"
 	"github.com/mreza0100/gptjarvis/internal/ports/chatport"
+	"github.com/mreza0100/gptjarvis/internal/ports/historyport"
 	"github.com/mreza0100/gptjarvis/internal/ports/interactorport"
 	"github.com/mreza0100/gptjarvis/internal/ports/runnerport"
 
@@ -16,31 +17,38 @@ import (
 
 type boot struct {
 	clinet             *openai.Client
-	chat               chatport.Chat
-	runner             runnerport.Runner
-	interactor         interactorport.Interactor
 	scriptCrashedTimes int
+
+	chat       chatport.Chat
+	runner     runnerport.Runner
+	interactor interactorport.Interactor
+	history    historyport.History
 }
 
 func NewBootSrv(req *srvport.ServicesReq) srvport.BootService {
 	return &boot{
 		clinet:             openai.NewClient("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"),
-		chat:               req.Chat,
-		runner:             req.Runner,
-		interactor:         req.Interactor,
 		scriptCrashedTimes: 0,
+
+		chat:       req.Chat,
+		runner:     req.Runner,
+		interactor: req.Interactor,
+		history:    req.History,
 	}
 }
 
 func (b *boot) initLLMRole() (*models.Response, error) {
-	roleDescription, err := os.ReadFile("./configs/role-description.gpt")
+	roleDescription, err := os.ReadFile("./configs/jarvis.gpt")
 	if err != nil {
 		return nil, err
 	}
 	roleDescriptionStr := string(roleDescription)
-	response, err := b.chat.Prompt(&models.Prompt{
+
+	prompt := &models.Prompt{
 		ClientPrompt: &roleDescriptionStr,
-	})
+	}
+	b.history.SavePrompt(prompt)
+	response, err := b.chat.Prompt(prompt)
 	if err != nil {
 		return nil, err
 	}
@@ -89,6 +97,7 @@ func (b *boot) Start() (err error) {
 	}
 
 	for {
+		b.history.SaveResponse(response)
 		prompt := &models.Prompt{}
 
 		if response.MessageToUser != "" {
@@ -112,6 +121,7 @@ func (b *boot) Start() (err error) {
 			}
 		}
 
+		b.history.SavePrompt(prompt)
 		response, err = b.chat.Prompt(prompt)
 		if err != nil {
 			return err

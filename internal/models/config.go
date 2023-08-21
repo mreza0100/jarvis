@@ -19,9 +19,16 @@ var Modes = struct {
 	Prod: prod,
 }
 
-type SavedConfigs struct{}
+type (
+	SavedConfigs    struct{}
+	ConstantConfigs struct {
+		RootDirPath    string
+		HistoryDirName string
+	}
+)
 
 type Configuration struct {
-	Mode         Mode
-	SavedConfigs *SavedConfigs
+	Mode            Mode
+	SavedConfigs    *SavedConfigs
+	ConstantConfigs *ConstantConfigs
 }
