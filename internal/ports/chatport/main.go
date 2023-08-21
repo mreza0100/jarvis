@@ -1,9 +1,11 @@
 package chatport
 
+import "github.com/mreza0100/gptjarvis/internal/models"
+
 type PromptOptions struct {
 	PromptRole string
 }
 
 type Chat interface {
-	Prompt(prompt string, optionsArg ...*PromptOptions) (string, error)
+	Prompt(prompt *models.Prompt, optionsArg ...*PromptOptions) (*models.Response, error)
 }

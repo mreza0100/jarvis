@@ -1,17 +1,16 @@
 package runner
 
 import (
-	"bufio"
-	"bytes"
+	"errors"
 	"fmt"
 	"log"
 	"os/exec"
-	"path"
 	"strings"
+	"syscall"
 
 	"github.com/gofrs/uuid"
+	"github.com/mreza0100/gptjarvis/internal/models"
 	"github.com/mreza0100/gptjarvis/internal/ports/runnerport"
-	"github.com/mreza0100/gptjarvis/pkg/os"
 )
 
 type runner struct {
@@ -32,69 +31,25 @@ func NewRunner() runnerport.Runner {
 	}
 }
 
-func (r *runner) makeExecutable(path string) error {
-	cmd := exec.Command("chmod", "+x", path)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+func (r *runner) ExecuteScript(request *models.ScriptRequest) (string, uint8, error) {
+	cmd := exec.Command(request.Runtime)
+	cmd.Stdin = strings.NewReader(request.Script)
 
-	return cmd.Run()
-}
-
-func (r *runner) writeScript(script string) (string, error) {
-	time := getTime()
-
-	pathName := path.Join(r.rootDir, r.conversationID, time)
-	f, err := os.OpenFile(pathName, os.CreateMode)
+	// output = stdout + stderr
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", err
-	}
-	defer func() { _ = f.Close() }()
-
-	_, err = f.WriteString(script)
-	return pathName, err
-}
-
-func (r *runner) getShebangLine(scriptPath string) (string, error) {
-	// Read the first line of the script
-	f, err := os.OpenFile(scriptPath, os.ReadMode)
-	if err != nil {
-		return "", err
-	}
-	defer func() { _ = f.Close() }()
-
-	scanner := bufio.NewScanner(f)
-	if scanner.Scan() {
-		firstLine := scanner.Text()
-		if strings.HasPrefix(firstLine, "#!") {
-			return firstLine[2:], nil // Remove the "#!" prefix
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
+				return string(output), uint8(status.ExitStatus()), err
+			}
 		}
+		return string(output), 0, err
 	}
 
-	return "", fmt.Errorf("no shebang line found")
-}
-
-func (r *runner) RunScript(script string) (string, error) {
-	path, err := r.writeScript(script)
-	if err != nil {
-		return "", err
-	}
-	err = r.makeExecutable(path)
-	if err != nil {
-		return "", err
+	if status, ok := cmd.ProcessState.Sys().(syscall.WaitStatus); ok {
+		return string(output), uint8(status.ExitStatus()), nil
 	}
 
-	shebangLine, err := r.getShebangLine(path)
-	if err != nil {
-		return "", err
-	}
-
-	cmd := exec.Command("bash", "-c", shebangLine)
-	cmd.Stdin = strings.NewReader(script) // Provide the script as input to the command
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout, cmd.Stderr = &stdout, &stderr
-
-	if err := cmd.Run(); err != nil {
-		return stderr.String(), err
-	}
-	return stdout.String(), nil
+	return string(output), 0, nil
 }
