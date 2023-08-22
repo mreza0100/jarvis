@@ -26,8 +26,8 @@ func NewHistory(cfgProvider cfgport.CfgProvider) historyport.History {
 		log.Fatal(err)
 	}
 
-	historyDirPath := path.Join(homeDir, constCfg.RootDirPath, constCfg.HistoryDirName, time.Now().Format("2006-01-02_15-04-05"))
-	fmt.Println(historyDirPath)
+	startTime := time.Now().Format("2006-01-02_15-04-05")
+	historyDirPath := path.Join(homeDir, constCfg.RootDirPath, constCfg.HistoryDirName, startTime)
 	return &history{
 		mode:             cfgProvider.GetCfg().Mode,
 		historyDirPath:   historyDirPath,

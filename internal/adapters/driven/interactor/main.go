@@ -75,7 +75,15 @@ func (i *interactor) Message(message string) {
 }
 
 func (i *interactor) Script(script *models.ScriptRequest) {
-	i.log(colorRed, "Script", script)
+	i.setColor(colorRed)
+	defer i.unsetColor()
+	if i.mode.IsDev() {
+		fmt.Printf("\n- Script:\n")
+		fmt.Printf("Runtime=%s\n", script.Runtime)
+		fmt.Printf("Script=%s\n", script.Script)
+		fmt.Printf("ReturnResults=%+v\n", script.ReturnResults)
+		fmt.Printf("\n--\n")
+	}
 }
 
 func (i *interactor) ScriptResults(result *models.ScriptResult) {

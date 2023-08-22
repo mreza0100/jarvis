@@ -8,4 +8,4 @@
 # 	sudo -u noroot /home/noroot/exec/gptjarvis boot
 
 boot:
-	MODE="dev" && go run . boot
+	export MODE="dev" && go run . boot
