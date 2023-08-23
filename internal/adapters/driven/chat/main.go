@@ -3,6 +3,7 @@ package chat
 import (
 	"context"
 	"encoding/json"
+	"math"
 
 	"github.com/mreza0100/gptjarvis/internal/models"
 	"github.com/mreza0100/gptjarvis/internal/pkg/terminal"
@@ -53,6 +54,7 @@ func (c *chat) rawPrompt(rawPrompt string, options *chatport.PromptOptions) (*mo
 
 	response := new(models.Response)
 	err = json.Unmarshal([]byte(rawResponse), response)
+	response.ToeknsUsed = c.calculateTokens()
 	return response, err
 }
 
@@ -78,4 +80,16 @@ func (c *chat) prompt(prompt *models.Prompt, options *chatport.PromptOptions) (*
 
 	response, err := c.rawPrompt(string(rawPrompt), options)
 	return response, err
+}
+
+func (c *chat) calculateTokens() int {
+	const tokensPer1000Chars = 1333.33
+
+	characters := 0
+	for _, m := range c.messages {
+		characters += len(m.Content)
+	}
+
+	tokens := int(math.Ceil(float64(characters) / 1000 * tokensPer1000Chars))
+	return tokens
 }

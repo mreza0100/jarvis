@@ -98,10 +98,11 @@ func (b *boot) Start(modelName string) (err error) {
 
 	for {
 		b.history.SaveResponse(response)
+
 		prompt := &models.Prompt{}
 
 		if response.MessageToUser != "" {
-			b.interactor.Message(response.MessageToUser)
+			b.interactor.Message(response.MessageToUser, response.ToeknsUsed)
 		}
 
 		if response.ScriptRequest != nil {

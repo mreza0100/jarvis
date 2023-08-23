@@ -60,10 +60,10 @@ func (i *interactor) log(color color, title string, message any) {
 	i.setColor(color)
 	defer i.unsetColor()
 
-	fmt.Printf("%s::\n%+v\n", title, message)
+	fmt.Printf("%s%+v\n", title, message)
 }
 
-func (i *interactor) Message(message string) {
+func (i *interactor) Message(message string, usedTokens int) {
 	screen, err := terminal.GetTerminalSize()
 	if err != nil {
 		log.Fatal(err)
@@ -71,7 +71,8 @@ func (i *interactor) Message(message string) {
 	}
 
 	renderedMarkdown := markdown.Render(message, screen.Width, 0)
-	i.log(colorCyan, "Message", string(renderedMarkdown))
+	i.log(colorYellow, "Used Tokens: ", usedTokens)
+	i.log(colorCyan, "\n", string(renderedMarkdown))
 }
 
 func (i *interactor) Script(script *models.ScriptRequest) {
