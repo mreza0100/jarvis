@@ -1,10 +1,10 @@
 package models
 
 type Prompt struct {
-	ClientPrompt       *string       `json:"ClientPrompt"`
-	UserPrompt         *string       `json:"UserPrompt"`
-	Screen             Screen        `json:"Screen"`
-	LastExecutedScript *ScriptResult `json:"LastExecutedScript"`
+	ClientPrompt     *string       `json:"ClientPrompt"`
+	UserPrompt       *string       `json:"UserPrompt"`
+	Screen           Screen        `json:"Screen"`
+	LastScriptResult *ScriptResult `json:"LastScriptResult"`
 }
 
 type Screen struct {

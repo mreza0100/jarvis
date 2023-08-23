@@ -68,7 +68,7 @@ func (b *boot) runScript(response *models.Response) (*models.ScriptResult, error
 		response, err = b.chat.Prompt(&models.Prompt{
 			ClientPrompt: &crashPrompt,
 			UserPrompt:   nil,
-			LastExecutedScript: &models.ScriptResult{
+			LastScriptResult: &models.ScriptResult{
 				Stdout:         output,
 				TerminalStatus: status,
 			},
@@ -110,7 +110,7 @@ func (b *boot) Start(modelName string) (err error) {
 				return err
 			}
 			if response.ScriptRequest.ReturnResults {
-				prompt.LastExecutedScript = scriptResult
+				prompt.LastScriptResult = scriptResult
 			}
 		}
 		if response.WaitForUserPrompt {
