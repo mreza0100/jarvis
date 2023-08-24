@@ -74,7 +74,7 @@ func (b *boot) runScript(response *models.Response) (*models.ScriptResult, error
 			},
 		})
 		if err != nil {
-			if response.ScriptRequest != nil {
+			if response != nil && response.ScriptRequest != nil {
 				return b.runScript(response)
 			} else {
 				return nil, err

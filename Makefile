@@ -9,3 +9,4 @@
 
 boot:
 	export MODE="dev" && go run . boot
+	go build .
