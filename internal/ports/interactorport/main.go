@@ -1,6 +1,6 @@
 package interactorport
 
-import "github.com/mreza0100/gptjarvis/internal/models"
+import "github.com/mreza0100/jarvis/internal/models"
 
 type Interactor interface {
 	GetUserInput() (string, error)

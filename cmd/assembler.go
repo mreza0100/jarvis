@@ -3,15 +3,15 @@ package cmd
 import (
 	"os"
 
-	"github.com/mreza0100/gptjarvis/internal/adapters/driven/chat"
-	"github.com/mreza0100/gptjarvis/internal/adapters/driven/config"
-	"github.com/mreza0100/gptjarvis/internal/adapters/driven/history"
-	"github.com/mreza0100/gptjarvis/internal/adapters/driven/interactor"
-	"github.com/mreza0100/gptjarvis/internal/adapters/driven/runner"
-	"github.com/mreza0100/gptjarvis/internal/adapters/driving/cmd"
-	"github.com/mreza0100/gptjarvis/internal/ports/cmdport"
-	"github.com/mreza0100/gptjarvis/internal/ports/srvport"
-	"github.com/mreza0100/gptjarvis/internal/services"
+	"github.com/mreza0100/jarvis/internal/adapters/driven/chat"
+	"github.com/mreza0100/jarvis/internal/adapters/driven/config"
+	"github.com/mreza0100/jarvis/internal/adapters/driven/history"
+	"github.com/mreza0100/jarvis/internal/adapters/driven/interactor"
+	"github.com/mreza0100/jarvis/internal/adapters/driven/runner"
+	"github.com/mreza0100/jarvis/internal/adapters/driving/cmd"
+	"github.com/mreza0100/jarvis/internal/ports/cmdport"
+	"github.com/mreza0100/jarvis/internal/ports/srvport"
+	"github.com/mreza0100/jarvis/internal/services"
 	"github.com/sashabaranov/go-openai"
 )
 

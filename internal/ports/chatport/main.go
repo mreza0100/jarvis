@@ -1,6 +1,6 @@
 package chatport
 
-import "github.com/mreza0100/gptjarvis/internal/models"
+import "github.com/mreza0100/jarvis/internal/models"
 
 type PromptOptions struct {
 	PromptRole string

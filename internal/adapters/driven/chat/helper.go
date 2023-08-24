@@ -1,7 +1,7 @@
 package chat
 
 import (
-	"github.com/mreza0100/gptjarvis/internal/ports/chatport"
+	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/sashabaranov/go-openai"
 )
 

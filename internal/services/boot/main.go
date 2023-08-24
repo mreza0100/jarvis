@@ -3,16 +3,16 @@ package boot
 import (
 	"fmt"
 
-	"github.com/mreza0100/gptjarvis/internal/models"
-	"github.com/mreza0100/gptjarvis/internal/ports/chatport"
-	"github.com/mreza0100/gptjarvis/internal/ports/historyport"
-	"github.com/mreza0100/gptjarvis/internal/ports/interactorport"
-	"github.com/mreza0100/gptjarvis/internal/ports/runnerport"
-	modelstore "github.com/mreza0100/gptjarvis/models"
+	"github.com/mreza0100/jarvis/internal/models"
+	"github.com/mreza0100/jarvis/internal/ports/chatport"
+	"github.com/mreza0100/jarvis/internal/ports/historyport"
+	"github.com/mreza0100/jarvis/internal/ports/interactorport"
+	"github.com/mreza0100/jarvis/internal/ports/runnerport"
+	modelstore "github.com/mreza0100/jarvis/models"
 
 	openai "github.com/sashabaranov/go-openai"
 
-	"github.com/mreza0100/gptjarvis/internal/ports/srvport"
+	"github.com/mreza0100/jarvis/internal/ports/srvport"
 )
 
 type boot struct {

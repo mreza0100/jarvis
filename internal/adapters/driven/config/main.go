@@ -8,9 +8,9 @@ import (
 	"path"
 	"strings"
 
-	"github.com/mreza0100/gptjarvis/internal/models"
-	"github.com/mreza0100/gptjarvis/internal/ports/cfgport"
-	"github.com/mreza0100/gptjarvis/pkg/os"
+	"github.com/mreza0100/jarvis/internal/models"
+	"github.com/mreza0100/jarvis/internal/ports/cfgport"
+	"github.com/mreza0100/jarvis/pkg/os"
 )
 
 var loadedConfigs *models.Configuration

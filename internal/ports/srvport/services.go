@@ -1,10 +1,10 @@
 package srvport
 
 import (
-	"github.com/mreza0100/gptjarvis/internal/ports/chatport"
-	"github.com/mreza0100/gptjarvis/internal/ports/historyport"
-	"github.com/mreza0100/gptjarvis/internal/ports/interactorport"
-	"github.com/mreza0100/gptjarvis/internal/ports/runnerport"
+	"github.com/mreza0100/jarvis/internal/ports/chatport"
+	"github.com/mreza0100/jarvis/internal/ports/historyport"
+	"github.com/mreza0100/jarvis/internal/ports/interactorport"
+	"github.com/mreza0100/jarvis/internal/ports/runnerport"
 )
 
 type ServicesReq struct {

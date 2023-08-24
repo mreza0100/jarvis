@@ -3,7 +3,7 @@ package terminal
 import (
 	"os"
 
-	"github.com/mreza0100/gptjarvis/internal/models"
+	"github.com/mreza0100/jarvis/internal/models"
 	"golang.org/x/term"
 )
 

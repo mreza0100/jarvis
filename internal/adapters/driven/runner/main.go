@@ -6,8 +6,8 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/mreza0100/gptjarvis/internal/models"
-	"github.com/mreza0100/gptjarvis/internal/ports/runnerport"
+	"github.com/mreza0100/jarvis/internal/models"
+	"github.com/mreza0100/jarvis/internal/ports/runnerport"
 )
 
 type runner struct{}

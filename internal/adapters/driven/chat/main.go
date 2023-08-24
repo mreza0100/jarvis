@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"math"
 
-	"github.com/mreza0100/gptjarvis/internal/models"
-	"github.com/mreza0100/gptjarvis/internal/pkg/terminal"
-	"github.com/mreza0100/gptjarvis/internal/ports/chatport"
+	"github.com/mreza0100/jarvis/internal/models"
+	"github.com/mreza0100/jarvis/internal/pkg/terminal"
+	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/sashabaranov/go-openai"
 )
 

@@ -1,4 +1,4 @@
-module github.com/mreza0100/gptjarvis
+module github.com/mreza0100/jarvis
 
 go 1.21
 

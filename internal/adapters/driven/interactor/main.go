@@ -9,10 +9,10 @@ import (
 
 	markdown "github.com/MichaelMure/go-term-markdown"
 
-	"github.com/mreza0100/gptjarvis/internal/models"
-	"github.com/mreza0100/gptjarvis/internal/pkg/terminal"
-	"github.com/mreza0100/gptjarvis/internal/ports/cfgport"
-	"github.com/mreza0100/gptjarvis/internal/ports/interactorport"
+	"github.com/mreza0100/jarvis/internal/models"
+	"github.com/mreza0100/jarvis/internal/pkg/terminal"
+	"github.com/mreza0100/jarvis/internal/ports/cfgport"
+	"github.com/mreza0100/jarvis/internal/ports/interactorport"
 )
 
 type interactor struct {
