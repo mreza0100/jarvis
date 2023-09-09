@@ -7,6 +7,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/mreza0100/jarvis/internal/models"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/mreza0100/jarvis/internal/ports/historyport"
 	"github.com/mreza0100/jarvis/internal/ports/interactorport"
@@ -15,41 +16,6 @@ import (
 
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
 )
-
-type OSReply struct {
-	MessageToUser     string           `json:"messageToUser"`
-	WaitForUserPrompt bool             `json:"waitForUserPrompt"`
-	ScriptRequest     *RunnerOSRequest `json:"Script"`
-	TokensUsed        int              `json:"_"`
-}
-
-type RunnerOSRequest struct {
-	Runtime string `json:"Runtime"`
-	Script  string `json:"Script"`
-}
-
-type RunnerOSResponse struct {
-	Stdout     string `json:"Stdout"`
-	StatusCode int    `json:"StatusCode"`
-}
-
-type Prompt struct {
-	ClientPrompt     *string       `json:"ClientPrompt"`
-	UserPrompt       *string       `json:"UserPrompt"`
-	Screen           *Screen       `json:"Screen"`
-	LastScriptResult *ScriptResult `json:"LastScriptResult"`
-}
-
-type Screen struct {
-	Width  int `json:"Width"`
-	Height int `json:"Height"`
-}
-
-type ScriptResult struct {
-	RunnerOSResult *RunnerOSResponse `json:"RunnerOSResult"`
-}
-
-// ---
 
 type osInteractiveSrv struct {
 	clinet             *openai.Client
@@ -71,12 +37,12 @@ func NewOSSrv(req *srvport.ServicesReq) srvport.BootService {
 	}
 }
 
-func (b *osInteractiveSrv) initLLMRole(prePrompt string) (*OSReply, error) {
-	prompt := &Prompt{
+func (b *osInteractiveSrv) initLLMRole(prePrompt string) (*models.OSReply, error) {
+	prompt := &models.Prompt{
 		ClientPrompt: &prePrompt,
 	}
 	b.history.SavePrompt(prompt)
-	reply := new(OSReply)
+	reply := new(models.OSReply)
 	err := b.chat.Prompt(prompt, reply)
 	if err != nil {
 		return nil, err
@@ -97,18 +63,17 @@ func (b *osInteractiveSrv) Start(prePrompt string) (err error) {
 	for {
 		b.history.SaveResponse(reply)
 
-		prompt := &Prompt{}
+		prompt := &models.Prompt{}
 
 		if reply.MessageToUser != "" {
 			b.interactor.Message(reply.MessageToUser, reply.TokensUsed)
 		}
 
 		if reply.ScriptRequest != nil {
-			scriptResult, err := b.processScript(reply)
+			prompt.LastScriptResult, err = b.processScript(reply)
 			if err != nil {
 				return err
 			}
-			prompt.LastScriptResult = scriptResult
 		}
 		if reply.WaitForUserPrompt {
 			userPrompt, err := b.interactor.GetUserInput()
@@ -127,7 +92,7 @@ func (b *osInteractiveSrv) Start(prePrompt string) (err error) {
 	}
 }
 
-func (b *osInteractiveSrv) processScript(reply *OSReply) (*ScriptResult, error) {
+func (b *osInteractiveSrv) processScript(reply *models.OSReply) (*models.ScriptResult, error) {
 	b.interactor.Script(reply.ScriptRequest)
 	defer func() { b.scriptCrashedTimes = 0 }()
 
@@ -135,12 +100,12 @@ func (b *osInteractiveSrv) processScript(reply *OSReply) (*ScriptResult, error) 
 	if err != nil {
 		b.scriptCrashedTimes++
 		crashPrompt := "last executed command crashed. recovering... try again"
-		reply := new(OSReply)
-		err = b.chat.Prompt(&Prompt{
+		reply := new(models.OSReply)
+		err = b.chat.Prompt(&models.Prompt{
 			ClientPrompt: &crashPrompt,
 			UserPrompt:   nil,
-			LastScriptResult: &ScriptResult{
-				RunnerOSResult: &RunnerOSResponse{
+			LastScriptResult: &models.ScriptResult{
+				RunnerOSResult: &models.RunnerOSResponse{
 					Stdout:     result.Stdout,
 					StatusCode: result.StatusCode,
 				},
@@ -157,8 +122,8 @@ func (b *osInteractiveSrv) processScript(reply *OSReply) (*ScriptResult, error) 
 		}
 	}
 
-	scriptResults := &ScriptResult{
-		RunnerOSResult: &RunnerOSResponse{
+	scriptResults := &models.ScriptResult{
+		RunnerOSResult: &models.RunnerOSResponse{
 			Stdout:     result.Stdout,
 			StatusCode: result.StatusCode,
 		},
@@ -168,7 +133,7 @@ func (b *osInteractiveSrv) processScript(reply *OSReply) (*ScriptResult, error) 
 	return scriptResults, nil
 }
 
-func (b *osInteractiveSrv) execScript(req *RunnerOSRequest) (*RunnerOSResponse, error) {
+func (b *osInteractiveSrv) execScript(req *models.RunnerOSRequest) (*models.RunnerOSResponse, error) {
 	cmd := exec.Command(req.Runtime)
 	cmd.Stdin = strings.NewReader(req.Script)
 
@@ -179,26 +144,26 @@ func (b *osInteractiveSrv) execScript(req *RunnerOSRequest) (*RunnerOSResponse, 
 		var exitErr *exec.ExitError
 		if errors.As(err, &exitErr) {
 			if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
-				return &RunnerOSResponse{
+				return &models.RunnerOSResponse{
 					StatusCode: status.ExitStatus(),
 					Stdout:     output,
 				}, err
 			}
 		}
-		return &RunnerOSResponse{
+		return &models.RunnerOSResponse{
 			StatusCode: 0,
 			Stdout:     output,
 		}, err
 	}
 
 	if status, ok := cmd.ProcessState.Sys().(syscall.WaitStatus); ok {
-		return &RunnerOSResponse{
+		return &models.RunnerOSResponse{
 			StatusCode: status.ExitStatus(),
 			Stdout:     output,
 		}, nil
 	}
 
-	return &RunnerOSResponse{
+	return &models.RunnerOSResponse{
 		StatusCode: 0,
 		Stdout:     output,
 	}, nil
