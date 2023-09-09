@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/golang-migrate/migrate/v4 v4.15.2
-	github.com/lib/pq v1.10.2
+	github.com/lib/pq v1.10.9
 	github.com/urfave/cli/v2 v2.23.7
 )
 

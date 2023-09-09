@@ -3,8 +3,8 @@ package models
 import "encoding/json"
 
 type HistoryRecord struct {
-	Prompt   *Prompt
-	Response *Response
+	Prompt interface{}
+	Reply  interface{}
 }
 
 func (h *HistoryRecord) Marshal() (string, error) {

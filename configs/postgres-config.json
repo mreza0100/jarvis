@@ -1,0 +1,7 @@
+{
+	"host": "30.0.0.10",
+	"port": 5432,
+	"username": "mamad",
+	"password": "mamadspass",
+	"database": "mamad_db"
+}

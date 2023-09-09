@@ -35,15 +35,15 @@ func NewHistory(cfgProvider cfgport.CfgProvider) historyport.History {
 	}
 }
 
-func (h *history) SavePrompt(prompt *models.Prompt) {
+func (h *history) SavePrompt(prompt interface{}) {
 	h.saveRecord(&models.HistoryRecord{
 		Prompt: prompt,
 	})
 }
 
-func (h *history) SaveResponse(response *models.Response) {
+func (h *history) SaveResponse(reply interface{}) {
 	h.saveRecord(&models.HistoryRecord{
-		Response: response,
+		Reply: reply,
 	})
 }
 

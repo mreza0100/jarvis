@@ -19,6 +19,7 @@ var Modes = struct {
 	Prod: prod,
 }
 
+// TODO: Have not put in use yet
 type (
 	SavedConfigs    struct{}
 	ConstantConfigs struct {

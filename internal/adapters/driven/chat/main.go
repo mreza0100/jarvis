@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"math"
 
-	"github.com/mreza0100/jarvis/internal/models"
-	"github.com/mreza0100/jarvis/internal/pkg/terminal"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/sashabaranov/go-openai"
 )
@@ -27,7 +25,7 @@ func NewChat(req *NewChatReq) chatport.Chat {
 	}
 }
 
-func (c *chat) rawPrompt(rawPrompt string, options *chatport.PromptOptions) (*models.Response, error) {
+func (c *chat) RawPrompt(rawPrompt string, replyAnswer interface{}, options *chatport.PromptOptions) error {
 	ctx := context.Background()
 
 	c.appendMessage(&openai.ChatCompletionMessage{
@@ -35,7 +33,7 @@ func (c *chat) rawPrompt(rawPrompt string, options *chatport.PromptOptions) (*mo
 		Content: rawPrompt,
 	})
 
-	resp, err := c.clinet.CreateChatCompletion(
+	chat, err := c.clinet.CreateChatCompletion(
 		ctx,
 		openai.ChatCompletionRequest{
 			Model:    openai.GPT3Dot5Turbo16K,
@@ -43,43 +41,36 @@ func (c *chat) rawPrompt(rawPrompt string, options *chatport.PromptOptions) (*mo
 		},
 	)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	rawResponse := resp.Choices[0].Message.Content
+	rawReply := chat.Choices[0].Message.Content
 	c.appendMessage(&openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleAssistant,
-		Content: rawResponse,
+		Content: rawReply,
 	})
 
-	response := new(models.Response)
-	err = json.Unmarshal([]byte(rawResponse), response)
-	response.ToeknsUsed = c.calculateTokens()
-	return response, err
+	err = json.Unmarshal([]byte(rawReply), replyAnswer)
+	// reply.ToeknsUsed = c.calculateTokens()
+	return err
 }
 
-func (c *chat) Prompt(prompt *models.Prompt, optionsArg ...*chatport.PromptOptions) (*models.Response, error) {
+func (c *chat) Prompt(prompt interface{}, replyAnswer interface{}, optionsArg ...*chatport.PromptOptions) error {
 	options := c.normalizeOptions(optionsArg...)
-	return c.prompt(prompt, options)
+	return c.prompt(prompt, replyAnswer, options)
+}
+
+func (c *chat) prompt(prompt interface{}, replyAnswer interface{}, options *chatport.PromptOptions) error {
+	rawPrompt, err := json.Marshal(prompt)
+	if err != nil {
+		return err
+	}
+	err = c.RawPrompt(string(rawPrompt), replyAnswer, options)
+	return err
 }
 
 func (c *chat) appendMessage(chat *openai.ChatCompletionMessage) {
 	c.messages = append(c.messages, *chat)
-}
-
-func (c *chat) prompt(prompt *models.Prompt, options *chatport.PromptOptions) (*models.Response, error) {
-	rawPrompt, err := json.Marshal(prompt)
-	if err != nil {
-		return nil, err
-	}
-
-	prompt.Screen, err = terminal.GetTerminalSize()
-	if err != nil {
-		return nil, err
-	}
-
-	response, err := c.rawPrompt(string(rawPrompt), options)
-	return response, err
 }
 
 func (c *chat) calculateTokens() int {

@@ -60,47 +60,41 @@ func (i *interactor) log(color color, title string, message any) {
 	i.setColor(color)
 	defer i.unsetColor()
 
-	fmt.Printf("%s%+v\n", title, message)
+	fmt.Printf("%s:\n%+v\n", title, message)
 }
 
 func (i *interactor) Message(message string, usedTokens int) {
-	screen, err := terminal.GetTerminalSize()
+	width, _, err := terminal.GetTerminalSize()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	renderedMarkdown := markdown.Render(message, screen.Width, 0)
+	renderedMarkdown := markdown.Render(message, width, 0)
 	i.log(colorYellow, "Used Tokens: ", usedTokens)
 	i.log(colorCyan, "\n", string(renderedMarkdown))
 }
 
-func (i *interactor) Script(script *models.ScriptRequest) {
+func (i *interactor) Script(script interface{}) {
 	i.setColor(colorRed)
 	defer i.unsetColor()
 	if i.mode.IsDev() {
 		fmt.Printf("\n- Script:\n")
-		fmt.Printf("Runtime=%s\n", script.Runtime)
-		fmt.Printf("Script=%s\n", script.Script)
-		fmt.Printf("ReturnResults=%+v\n", script.ReturnResults)
+		fmt.Printf("script.String()=%+v\n", script)
 		fmt.Printf("\n--\n")
 	}
 }
 
-func (i *interactor) ScriptResults(result *models.ScriptResult) {
+func (i *interactor) ScriptResults(result interface{}) {
 	if i.mode.IsDev() {
-		i.log(colorBlue, "ScriptResults", result)
+		i.log(colorBlue, "Script Results", result)
 	}
 }
 
-func (i *interactor) Response(response *models.Response) {
+func (i *interactor) Reply(reply interface{}) {
 	i.setColor(colorPurple)
 	defer i.unsetColor()
 	if i.mode.IsDev() {
-		fmt.Printf("\n--\n%s::\n", "Response")
-		fmt.Printf("MessageToUser=%s\n", response.MessageToUser)
-		fmt.Printf("WaitForUserPrompt=%v\n", response.WaitForUserPrompt)
-		fmt.Printf("ScriptRequest=%+v\n", response.ScriptRequest)
-		fmt.Printf("\n--\n")
+		i.log(colorGreen, "Reply", reply)
 	}
 }
