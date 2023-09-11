@@ -7,6 +7,7 @@ import (
 	"github.com/mreza0100/jarvis/internal/adapters/driven/config"
 	"github.com/mreza0100/jarvis/internal/adapters/driven/history"
 	"github.com/mreza0100/jarvis/internal/adapters/driven/interactor"
+	"github.com/mreza0100/jarvis/internal/adapters/driven/runners"
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
 	"github.com/mreza0100/jarvis/internal/services"
 	"github.com/sashabaranov/go-openai"
@@ -16,6 +17,7 @@ import (
 func (c *cmd) OSController(_ *cli.Context) error {
 	cfgProvider := config.NewConfigProvider()
 	history := history.NewHistory(cfgProvider)
+	runner := runners.NewOSRunner()
 
 	chat := chat.NewChat(&chat.NewChatReq{
 		Clinet: openai.NewClient("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"),
@@ -28,6 +30,7 @@ func (c *cmd) OSController(_ *cli.Context) error {
 		Stderr: os.Stderr,
 	})
 	bootSrv := services.NewOSSrv(&srvport.OSServicesReq{
+		Runner:     runner,
 		Chat:       chat,
 		Interactor: interactor,
 		History:    history,

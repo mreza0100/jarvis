@@ -10,15 +10,31 @@ import (
 func Main() {
 	handlers := cmd.NewCMDHandler(&cmd.CmdHandlerParams{})
 
-	// TODO: Get this cli configs from the adaper itself
+	pgsCliConf := &cli.Command{
+		Name:        "postgres",
+		Aliases:     []string{"pgs"},
+		Description: "jarvis interactive Postgres",
+		Action:      handlers.PgsController,
+		Flags:       []cli.Flag{},
+	}
+
+	osCliConf := &cli.Command{
+		Name:        "os",
+		Aliases:     []string{},
+		Description: "jarvis interactive terminal",
+		Action:      handlers.OSController,
+		Flags:       []cli.Flag{},
+	}
+
 	app := &cli.App{
 		Commands: []*cli.Command{
 			{
 				Name:        "interactive",
 				Aliases:     []string{"i"},
-				Description: "jarvis interactive terminal",
-				Flags:       []cli.Flag{},
-				Action:      handlers.Interactive,
+				Description: "jarvis interactive terminal interactive models",
+				Subcommands: []*cli.Command{
+					pgsCliConf, osCliConf,
+				},
 			},
 		},
 	}

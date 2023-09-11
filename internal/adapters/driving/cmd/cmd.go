@@ -1,11 +1,8 @@
 package cmd
 
 import (
-	"errors"
-
 	"github.com/mreza0100/jarvis/internal/ports/cmdport"
 	templatestore "github.com/mreza0100/jarvis/templates"
-	"github.com/urfave/cli/v2"
 )
 
 type cmd struct{}
@@ -24,18 +21,4 @@ func (c *cmd) getTemplate(templateName string) (string, error) {
 
 	templ := string(content)
 	return templ, nil
-}
-
-func (c *cmd) Interactive(ctx *cli.Context) error {
-	controllerName := ctx.Args().Get(0)
-
-	switch controllerName {
-	case "os":
-		return c.OSController(ctx)
-	case "postgres":
-		return c.pgsController(ctx)
-
-	default:
-		return errors.New("Failed to find jarvis model")
-	}
 }

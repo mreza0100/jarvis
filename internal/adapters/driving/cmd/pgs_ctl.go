@@ -26,8 +26,8 @@ func readPostgresConfig(path string) (*models.PostgresConnConfig, error) {
 	return configs, json.Unmarshal(rawContent, configs)
 }
 
-func (c *cmd) pgsController(ctx *cli.Context) error {
-	configFilePath := ctx.Args().Get(1)
+func (c *cmd) PgsController(ctx *cli.Context) error {
+	configFilePath := ctx.Args().Get(0)
 	configs, err := readPostgresConfig(configFilePath)
 	if err != nil {
 		return err
