@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/mreza0100/jarvis/internal/models"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/mreza0100/jarvis/internal/ports/historyport"
@@ -13,8 +11,7 @@ import (
 )
 
 type pgsInteractiveSrv struct {
-	clinet             *openai.Client
-	scriptCrashedTimes int
+	clinet *openai.Client
 
 	runner     runnerport.PgsRunner
 	interactor interactorport.Interactor
@@ -24,8 +21,7 @@ type pgsInteractiveSrv struct {
 
 func NewPgsSrv(req *srvport.PgsServicesReq) srvport.PgsInteractiveService {
 	return &pgsInteractiveSrv{
-		clinet:             openai.NewClient("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"),
-		scriptCrashedTimes: 0,
+		clinet: openai.NewClient("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"),
 
 		runner:     req.Runner,
 		chat:       req.Chat,
@@ -55,7 +51,7 @@ func (b *pgsInteractiveSrv) Start(prePrompt string) (err error) {
 	}
 
 	for {
-		b.history.SaveResponse(reply)
+		b.history.SaveReply(reply)
 
 		prompt := &models.PgsPrompt{}
 
@@ -79,46 +75,26 @@ func (b *pgsInteractiveSrv) Start(prePrompt string) (err error) {
 
 		b.history.SavePrompt(prompt)
 		if err := b.chat.Prompt(prompt, reply); err != nil {
-			return err
-		}
+			clientPrompt := "client crash, error: " + err.Error()
+			prompt := &models.PgsPrompt{
+				UserPrompt:   nil,
+				ClientPrompt: &clientPrompt,
+			}
 
+			if err := b.chat.Prompt(prompt, reply); err != nil {
+				return err
+			}
+		}
 		b.interactor.Reply(reply)
 	}
 }
 
 func (b *pgsInteractiveSrv) processScript(scriptRequest *models.PgsRunnerRequest) (*models.PgsScriptResult, error) {
 	b.interactor.Script(scriptRequest)
-	defer func() { b.scriptCrashedTimes = 0 }()
 
 	runnerResult, err := b.runner.ExecScript(scriptRequest)
 	if err != nil {
-		b.scriptCrashedTimes++
-		crashPrompt := "last executed command crashed. recovering... try again"
-		reply := new(models.PgsReply)
-		err = b.chat.Prompt(&models.PgsPrompt{
-			ClientPrompt: &crashPrompt,
-			UserPrompt:   nil,
-			LastQueryResult: &models.PgsScriptResult{
-				RunnerPgsResult: runnerResult,
-			},
-		}, reply)
-		if err != nil {
-			if b.scriptCrashedTimes > 5 {
-				return nil, err
-			}
-			if reply != nil && reply.QueryRequest != nil {
-				return b.processScript(scriptRequest)
-			}
-			return nil, err
-		}
-	}
-
-	if runnerResult != nil {
-		res := runnerResult.QueryResponses
-		for _, r := range res {
-			fmt.Printf("%+v\n", r)
-		}
-		fmt.Printf("runnerResult%+v\n", runnerResult.QueryResponses)
+		return nil, err
 	}
 
 	scriptResults := &models.PgsScriptResult{

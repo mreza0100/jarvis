@@ -2,5 +2,5 @@ package historyport
 
 type History interface {
 	SavePrompt(prompt interface{})
-	SaveResponse(prompt interface{})
+	SaveReply(prompt interface{})
 }

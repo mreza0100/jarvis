@@ -60,7 +60,7 @@ func (b *osInteractiveSrv) Start(prePrompt string) (err error) {
 	}
 
 	for {
-		b.history.SaveResponse(reply)
+		b.history.SaveReply(reply)
 
 		prompt := &models.OSPrompt{}
 

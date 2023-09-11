@@ -41,7 +41,7 @@ func (h *history) SavePrompt(prompt interface{}) {
 	})
 }
 
-func (h *history) SaveResponse(reply interface{}) {
+func (h *history) SaveReply(reply interface{}) {
 	h.saveRecord(&models.HistoryRecord{
 		Reply: reply,
 	})

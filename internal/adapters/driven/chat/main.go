@@ -3,6 +3,7 @@ package chat
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"math"
 
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
@@ -41,6 +42,7 @@ func (c *chat) RawPrompt(rawPrompt string, replyAnswer interface{}, options *cha
 		},
 	)
 	if err != nil {
+		fmt.Println(1)
 		return err
 	}
 
@@ -50,9 +52,7 @@ func (c *chat) RawPrompt(rawPrompt string, replyAnswer interface{}, options *cha
 		Content: rawReply,
 	})
 
-	err = json.Unmarshal([]byte(rawReply), replyAnswer)
-	// reply.ToeknsUsed = c.calculateTokens()
-	return err
+	return json.Unmarshal([]byte(rawReply), replyAnswer)
 }
 
 func (c *chat) Prompt(prompt interface{}, replyAnswer interface{}, optionsArg ...*chatport.PromptOptions) error {
@@ -65,8 +65,7 @@ func (c *chat) prompt(prompt interface{}, replyAnswer interface{}, options *chat
 	if err != nil {
 		return err
 	}
-	err = c.RawPrompt(string(rawPrompt), replyAnswer, options)
-	return err
+	return c.RawPrompt(string(rawPrompt), replyAnswer, options)
 }
 
 func (c *chat) appendMessage(chat *openai.ChatCompletionMessage) {
