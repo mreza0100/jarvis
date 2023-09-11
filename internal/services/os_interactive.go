@@ -1,16 +1,13 @@
 package services
 
 import (
-	"errors"
 	"fmt"
-	"os/exec"
-	"strings"
-	"syscall"
 
 	"github.com/mreza0100/jarvis/internal/models"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/mreza0100/jarvis/internal/ports/historyport"
 	"github.com/mreza0100/jarvis/internal/ports/interactorport"
+	runnerport "github.com/mreza0100/jarvis/internal/ports/runner_port"
 
 	openai "github.com/sashabaranov/go-openai"
 
@@ -21,16 +18,18 @@ type osInteractiveSrv struct {
 	clinet             *openai.Client
 	scriptCrashedTimes int
 
+	runner     runnerport.OSRunner
 	chat       chatport.Chat
 	interactor interactorport.Interactor
 	history    historyport.History
 }
 
-func NewOSSrv(req *srvport.ServicesReq) srvport.BootService {
+func NewOSSrv(req *srvport.OSServicesReq) srvport.OSInteractiveService {
 	return &osInteractiveSrv{
 		clinet:             openai.NewClient("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"),
 		scriptCrashedTimes: 0,
 
+		runner:     req.Runner,
 		chat:       req.Chat,
 		interactor: req.Interactor,
 		history:    req.History,
@@ -38,7 +37,7 @@ func NewOSSrv(req *srvport.ServicesReq) srvport.BootService {
 }
 
 func (b *osInteractiveSrv) initLLMRole(prePrompt string) (*models.OSReply, error) {
-	prompt := &models.Prompt{
+	prompt := &models.OSPrompt{
 		ClientPrompt: &prePrompt,
 	}
 	b.history.SavePrompt(prompt)
@@ -63,7 +62,7 @@ func (b *osInteractiveSrv) Start(prePrompt string) (err error) {
 	for {
 		b.history.SaveResponse(reply)
 
-		prompt := &models.Prompt{}
+		prompt := &models.OSPrompt{}
 
 		if reply.MessageToUser != "" {
 			b.interactor.Message(reply.MessageToUser, reply.TokensUsed)
@@ -92,20 +91,20 @@ func (b *osInteractiveSrv) Start(prePrompt string) (err error) {
 	}
 }
 
-func (b *osInteractiveSrv) processScript(reply *models.OSReply) (*models.ScriptResult, error) {
+func (b *osInteractiveSrv) processScript(reply *models.OSReply) (*models.OSScriptResult, error) {
 	b.interactor.Script(reply.ScriptRequest)
 	defer func() { b.scriptCrashedTimes = 0 }()
 
-	result, err := b.execScript(reply.ScriptRequest)
+	result, err := b.runner.ExecScript(reply.ScriptRequest)
 	if err != nil {
 		b.scriptCrashedTimes++
 		crashPrompt := "last executed command crashed. recovering... try again"
 		reply := new(models.OSReply)
-		err = b.chat.Prompt(&models.Prompt{
+		err = b.chat.Prompt(&models.OSPrompt{
 			ClientPrompt: &crashPrompt,
 			UserPrompt:   nil,
-			LastScriptResult: &models.ScriptResult{
-				RunnerOSResult: &models.RunnerOSResponse{
+			LastScriptResult: &models.OSScriptResult{
+				RunnerOSResult: &models.OSRunnerResult{
 					Stdout:     result.Stdout,
 					StatusCode: result.StatusCode,
 				},
@@ -122,8 +121,8 @@ func (b *osInteractiveSrv) processScript(reply *models.OSReply) (*models.ScriptR
 		}
 	}
 
-	scriptResults := &models.ScriptResult{
-		RunnerOSResult: &models.RunnerOSResponse{
+	scriptResults := &models.OSScriptResult{
+		RunnerOSResult: &models.OSRunnerResult{
 			Stdout:     result.Stdout,
 			StatusCode: result.StatusCode,
 		},
@@ -131,40 +130,4 @@ func (b *osInteractiveSrv) processScript(reply *models.OSReply) (*models.ScriptR
 	b.interactor.ScriptResults(scriptResults)
 
 	return scriptResults, nil
-}
-
-func (b *osInteractiveSrv) execScript(req *models.RunnerOSRequest) (*models.RunnerOSResponse, error) {
-	cmd := exec.Command(req.Runtime)
-	cmd.Stdin = strings.NewReader(req.Script)
-
-	// output = stdout + stderr
-	rawOutput, err := cmd.CombinedOutput()
-	output := string(rawOutput)
-	if err != nil {
-		var exitErr *exec.ExitError
-		if errors.As(err, &exitErr) {
-			if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
-				return &models.RunnerOSResponse{
-					StatusCode: status.ExitStatus(),
-					Stdout:     output,
-				}, err
-			}
-		}
-		return &models.RunnerOSResponse{
-			StatusCode: 0,
-			Stdout:     output,
-		}, err
-	}
-
-	if status, ok := cmd.ProcessState.Sys().(syscall.WaitStatus); ok {
-		return &models.RunnerOSResponse{
-			StatusCode: status.ExitStatus(),
-			Stdout:     output,
-		}, nil
-	}
-
-	return &models.RunnerOSResponse{
-		StatusCode: 0,
-		Stdout:     output,
-	}, nil
 }

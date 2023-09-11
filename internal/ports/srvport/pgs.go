@@ -4,18 +4,20 @@ import (
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/mreza0100/jarvis/internal/ports/historyport"
 	"github.com/mreza0100/jarvis/internal/ports/interactorport"
+	runnerport "github.com/mreza0100/jarvis/internal/ports/runner_port"
 )
 
-type ServicesReq struct {
+type PgsServicesReq struct {
+	Runner     runnerport.PgsRunner
 	Chat       chatport.Chat
 	Interactor interactorport.Interactor
 	History    historyport.History
 }
 
-type Services struct {
-	BootService BootService
+type PgsServices struct {
+	BootService PgsInteractiveService
 }
 
-type BootService interface {
+type PgsInteractiveService interface {
 	Start(modelName string) error
 }

@@ -32,8 +32,8 @@ func (c *cmd) Interactive(ctx *cli.Context) error {
 	switch controllerName {
 	case "os":
 		return c.OSController(ctx)
-	// case "postgres":
-	// 	return c.bootPostgres(ctx)
+	case "postgres":
+		return c.pgsController(ctx)
 
 	default:
 		return errors.New("Failed to find jarvis model")

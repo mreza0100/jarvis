@@ -10,7 +10,7 @@ import (
 	markdown "github.com/MichaelMure/go-term-markdown"
 
 	"github.com/mreza0100/jarvis/internal/models"
-	"github.com/mreza0100/jarvis/internal/pkg/terminal"
+	"github.com/mreza0100/jarvis/internal/pkg/tools"
 	"github.com/mreza0100/jarvis/internal/ports/cfgport"
 	"github.com/mreza0100/jarvis/internal/ports/interactorport"
 )
@@ -64,7 +64,7 @@ func (i *interactor) log(color color, title string, message any) {
 }
 
 func (i *interactor) Message(message string, usedTokens int) {
-	width, _, err := terminal.GetTerminalSize()
+	width, _, err := tools.GetTerminalSize()
 	if err != nil {
 		log.Fatal(err)
 		return

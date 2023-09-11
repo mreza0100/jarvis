@@ -3,13 +3,15 @@ module github.com/mreza0100/jarvis
 go 1.21
 
 require (
+	github.com/MichaelMure/go-term-markdown v0.1.4
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/lib/pq v1.10.9
+	github.com/pkg/errors v0.9.1
 	github.com/urfave/cli/v2 v2.23.7
+	golang.org/x/term v0.11.0
 )
 
 require (
-	github.com/MichaelMure/go-term-markdown v0.1.4 // indirect
 	github.com/MichaelMure/go-term-text v0.3.1 // indirect
 	github.com/alecthomas/chroma v0.7.1 // indirect
 	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
@@ -28,12 +30,10 @@ require (
 	golang.org/x/image v0.0.0-20210216034530-4410531fe030 // indirect
 	golang.org/x/net v0.2.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
-	golang.org/x/term v0.11.0 // indirect
 )
 
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
-	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
