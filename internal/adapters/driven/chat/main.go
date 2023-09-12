@@ -3,7 +3,6 @@ package chat
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"math"
 
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
@@ -42,7 +41,6 @@ func (c *chat) RawPrompt(rawPrompt string, replyAnswer interface{}, options *cha
 		},
 	)
 	if err != nil {
-		fmt.Println(1)
 		return err
 	}
 

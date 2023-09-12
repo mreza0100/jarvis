@@ -63,6 +63,13 @@ func (i *interactor) log(color color, title string, message any) {
 	fmt.Printf("%s:\n%+v\n", title, message)
 }
 
+func (i *interactor) logToken(color color, tokens int) {
+	i.setColor(color)
+	defer i.unsetColor()
+
+	fmt.Printf("Tokens Used: %d\n", tokens)
+}
+
 func (i *interactor) Message(message string, usedTokens int) {
 	width, _, err := tools.GetTerminalSize()
 	if err != nil {
@@ -71,7 +78,7 @@ func (i *interactor) Message(message string, usedTokens int) {
 	}
 
 	renderedMarkdown := markdown.Render(message, width, 0)
-	i.log(colorYellow, "Used Tokens: ", usedTokens)
+	i.logToken(colorYellow, usedTokens)
 	i.log(colorCyan, "\n", string(renderedMarkdown))
 }
 
