@@ -7,7 +7,7 @@ import (
 	"syscall"
 
 	"github.com/mreza0100/jarvis/internal/models"
-	runnerport "github.com/mreza0100/jarvis/internal/ports/runner_port"
+	runnerport "github.com/mreza0100/jarvis/internal/ports/runnerport"
 )
 
 type osRunner struct{}
