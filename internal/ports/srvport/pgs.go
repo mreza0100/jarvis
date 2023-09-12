@@ -1,6 +1,7 @@
 package srvport
 
 import (
+	"github.com/mreza0100/jarvis/internal/ports/cfgport"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/mreza0100/jarvis/internal/ports/historyport"
 	"github.com/mreza0100/jarvis/internal/ports/interactorport"
@@ -8,10 +9,11 @@ import (
 )
 
 type PgsServicesReq struct {
-	Runner     runnerport.PgsRunner
-	Chat       chatport.Chat
-	Interactor interactorport.Interactor
-	History    historyport.History
+	ConfigProvider cfgport.CfgProvider
+	Runner         runnerport.PgsRunner
+	Chat           chatport.Chat
+	Interactor     interactorport.Interactor
+	History        historyport.History
 }
 
 type PgsServices struct {

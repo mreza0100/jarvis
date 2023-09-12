@@ -35,10 +35,11 @@ func (c *cmd) PgsController(ctx *cli.Context) error {
 		Stderr: os.Stderr,
 	})
 	bootSrv := services.NewPgsSrv(&srvport.PgsServicesReq{
-		Chat:       chat,
-		Runner:     runner,
-		Interactor: interactor,
-		History:    history,
+		ConfigProvider: cfgProvider,
+		Chat:           chat,
+		Runner:         runner,
+		Interactor:     interactor,
+		History:        history,
 	})
 
 	template, err := c.getTemplate("postgres.gpt")

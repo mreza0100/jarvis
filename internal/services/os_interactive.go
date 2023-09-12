@@ -26,7 +26,7 @@ type osInteractiveSrv struct {
 
 func NewOSSrv(req *srvport.OSServicesReq) srvport.OSInteractiveService {
 	return &osInteractiveSrv{
-		clinet:             openai.NewClient("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"),
+		clinet:             openai.NewClient(req.ConfigProvider.GetCfg().Token),
 		scriptCrashedTimes: 0,
 
 		runner:     req.Runner,
@@ -65,7 +65,7 @@ func (b *osInteractiveSrv) Start(prePrompt string) (err error) {
 		prompt := &models.OSPrompt{}
 
 		if reply.MessageToUser != "" {
-			b.interactor.Message(reply.MessageToUser, reply.TokensUsed)
+			b.interactor.Message(reply.MessageToUser, b.chat.CountTokens())
 		}
 
 		if reply.ScriptRequest != nil {

@@ -31,10 +31,11 @@ func (c *cmd) OSController(_ *cli.Context) error {
 		Stderr: os.Stderr,
 	})
 	bootSrv := services.NewOSSrv(&srvport.OSServicesReq{
-		Runner:     runner,
-		Chat:       chat,
-		Interactor: interactor,
-		History:    history,
+		ConfigProvider: cfgProvider,
+		Runner:         runner,
+		Chat:           chat,
+		Interactor:     interactor,
+		History:        history,
 	})
 
 	template, err := c.getTemplate("os.gpt")
