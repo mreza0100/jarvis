@@ -20,16 +20,16 @@ type history struct {
 }
 
 func NewHistory(cfgProvider cfgport.CfgProvider) historyport.History {
-	constCfg := cfgProvider.GetCfg().ConstantConfigs
+	cfg := cfgProvider.GetCfg()
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	startTime := time.Now().Format("2006-01-02_15-04-05")
-	historyDirPath := path.Join(homeDir, constCfg.RootDirPath, constCfg.HistoryDirName, startTime)
+	historyDirPath := path.Join(homeDir, cfg.RootDirName, cfg.HistoryDirName, startTime)
 	return &history{
-		mode:             cfgProvider.GetCfg().Mode,
+		mode:             cfg.Mode,
 		historyDirPath:   historyDirPath,
 		chatIndexTracker: 0,
 	}

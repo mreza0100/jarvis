@@ -15,12 +15,13 @@ import (
 )
 
 func (c *cmd) OSController(_ *cli.Context) error {
-	cfgProvider := config.NewConfigProvider()
+	cfgProvider := config.NewConfigProvider(nil)
 	history := history.NewHistory(cfgProvider)
 	runner := runners.NewOSRunner()
 
+	cfg := cfgProvider.GetCfg()
 	chat := chat.NewChat(&chat.NewChatReq{
-		Clinet: openai.NewClient("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"),
+		Clinet: openai.NewClient(cfg.Token),
 	})
 	interactor := interactor.NewInteractor(interactor.InteractorArg{
 		CfgProvider: cfgProvider,

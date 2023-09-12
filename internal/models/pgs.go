@@ -53,10 +53,6 @@ type PostgresConnConfig struct {
 	Database string `json:"database"`
 }
 
-// runnerport.PostgresConfig{
-// 	Host:     "30.0.0.10",
-// 	Port:     5432,
-// 	Username: "mamad",
-// 	Password: "mamadspass",
-// 	Database: "mamad_db",
-// }
+type PostgresConfig struct {
+	PostgresConnConfig PostgresConnConfig `json:"connection"`
+}

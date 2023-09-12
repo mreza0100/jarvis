@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"os"
 
 	"github.com/mreza0100/jarvis/internal/adapters/driven/chat"
@@ -9,38 +8,24 @@ import (
 	"github.com/mreza0100/jarvis/internal/adapters/driven/history"
 	"github.com/mreza0100/jarvis/internal/adapters/driven/interactor"
 	"github.com/mreza0100/jarvis/internal/adapters/driven/runners"
-	"github.com/mreza0100/jarvis/internal/models"
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
 	"github.com/mreza0100/jarvis/internal/services"
 	"github.com/sashabaranov/go-openai"
 	"github.com/urfave/cli/v2"
 )
 
-func readPostgresConfig(path string) (*models.PostgresConnConfig, error) {
-	rawContent, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	configs := new(models.PostgresConnConfig)
-	return configs, json.Unmarshal(rawContent, configs)
-}
-
 func (c *cmd) PgsController(ctx *cli.Context) error {
 	configFilePath := ctx.Args().Get(0)
-	configs, err := readPostgresConfig(configFilePath)
-	if err != nil {
-		return err
-	}
 
-	cfgProvider := config.NewConfigProvider()
+	cfgProvider := config.NewConfigProvider(&configFilePath)
 	history := history.NewHistory(cfgProvider)
+	cfg := cfgProvider.GetCfg()
 	runner := runners.NewPgsRunner(&runners.PgsRunnerReq{
-		Configs: configs,
+		Configs: &cfg.ConfigFile.PostgresConfig.PostgresConnConfig,
 	})
 
 	chat := chat.NewChat(&chat.NewChatReq{
-		Clinet: openai.NewClient("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"),
+		Clinet: openai.NewClient(cfg.Token),
 	})
 	interactor := interactor.NewInteractor(interactor.InteractorArg{
 		CfgProvider: cfgProvider,

@@ -19,17 +19,15 @@ var Modes = struct {
 	Prod: prod,
 }
 
-// TODO: Have not put in use yet
-type (
-	SavedConfigs    struct{}
-	ConstantConfigs struct {
-		RootDirPath    string
-		HistoryDirName string
-	}
-)
-
 type Configuration struct {
-	Mode            Mode
-	SavedConfigs    *SavedConfigs
-	ConstantConfigs *ConstantConfigs
+	RootDirName    string
+	HistoryDirName string
+	Token          string
+	Mode           Mode
+
+	ConfigFile *ConfigFile
+}
+
+type ConfigFile struct {
+	PostgresConfig PostgresConfig `json:"postgres"`
 }

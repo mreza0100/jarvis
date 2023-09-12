@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"path"
@@ -13,7 +12,17 @@ import (
 	"github.com/mreza0100/jarvis/pkg/os"
 )
 
-var loadedConfigs *models.Configuration
+var configFileEmptySchehma = models.ConfigFile{
+	PostgresConfig: models.PostgresConfig{
+		PostgresConnConfig: models.PostgresConnConfig{
+			Host:     "",
+			Port:     5432,
+			Username: "",
+			Password: "",
+			Database: "",
+		},
+	},
+}
 
 const (
 	configDirName  = ".jarvis"
@@ -21,49 +30,47 @@ const (
 	historyDirName = "history"
 )
 
-type configs struct {
-	cfg *models.Configuration
+type configProvider struct {
+	cfg            *models.Configuration
+	configFilePath *string
 }
 
-func NewConfigProvider() cfgport.CfgProvider {
-	if loadedConfigs != nil {
-		return &configs{cfg: loadedConfigs}
+func NewConfigProvider(path *string) cfgport.CfgProvider {
+	cfg := &configProvider{
+		configFilePath: path,
+		cfg: &models.Configuration{
+			ConfigFile: &models.ConfigFile{},
+		},
 	}
-
-	cfg := &configs{cfg: &models.Configuration{}}
-	cfg.setEnvConfigs()
-	cfg.setSavedConfigs()
-	cfg.setConstantConfigs()
+	cfg.RefreshCfg(path)
 	return cfg
 }
 
-func (c *configs) GetCfg() *models.Configuration {
+func (c *configProvider) RefreshCfg(path *string) *models.Configuration {
+	if path != nil {
+		c.loadConfigFile(*path)
+	}
+	c.setEnvConfigs()
+	c.setConstantConfigs()
 	return c.cfg
 }
 
-func (c *configs) setEnvConfigs() {
+func (c *configProvider) GetCfg() *models.Configuration {
+	return c.cfg
+}
+
+func (c *configProvider) setEnvConfigs() {
+	c.cfg.Token = os.Getenv("OPEN_API_KEY")
 	c.cfg.Mode = getModeFromEnv("MODE")
 }
 
-func (c *configs) setConstantConfigs() {
-	c.cfg.ConstantConfigs = &models.ConstantConfigs{
-		RootDirPath:    configDirName,
-		HistoryDirName: historyDirName,
-	}
+func (c *configProvider) setConstantConfigs() {
+	c.cfg.HistoryDirName = historyDirName
+	c.cfg.RootDirName = configDirName
 }
 
-func (c *configs) setSavedConfigs() {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-
-	jarvisDir := path.Join(homeDir, configDirName)
-
-	savedConfigs := new(models.SavedConfigs)
-
-	cfgF, err := os.OpenFile(path.Join(jarvisDir, configFileName), os.ReadCreateMode)
+func (c *configProvider) loadConfigFile(p string) {
+	cfgF, err := os.OpenFile(path.Join(p), os.ReadCreateMode)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,29 +79,67 @@ func (c *configs) setSavedConfigs() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	content := string(rawContent)
-	if content == "" {
-		// TODO: Marshal savedConfigs and write it instead of {}
-		content = "{}"
-		cfgF, err := os.OpenFile(path.Join(jarvisDir, configFileName), os.AppendMode)
+	if len(rawContent) == 0 {
+		jsonConfigSchema, err := json.Marshal(configFileEmptySchehma)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if _, err := io.WriteString(cfgF, content); err != nil {
+		f, err := os.OpenFile(p, os.AppendMode)
+		if err != nil {
 			log.Fatal(err)
 		}
+		if _, err := io.WriteString(f, string(jsonConfigSchema)); err != nil {
+			log.Fatal(err)
+		}
+		rawContent = jsonConfigSchema
 	}
-	if err := json.Unmarshal([]byte(content), savedConfigs); err != nil {
+	if err := json.Unmarshal(rawContent, c.cfg.ConfigFile); err != nil {
 		log.Fatal(err)
 	}
 }
 
 func getModeFromEnv(key string) models.Mode {
-	value := strings.ToLower(os.Getenv(key))
-	switch value {
+	switch value := strings.ToLower(os.Getenv(key)); value {
 	case "dev":
 		return models.Modes.Dev
 	default:
 		return models.Modes.Prod
 	}
 }
+
+// func (c *configs) setSavedConfigs() {
+// 	homeDir, err := os.UserHomeDir()
+// 	if err != nil {
+// 		fmt.Println("Error:", err)
+// 		return
+// 	}
+
+// 	jarvisDir := path.Join(homeDir, configDirName)
+
+// 	savedConfigs := new(models.SavedConfigs)
+
+// cfgF, err := os.OpenFile(path.Join(jarvisDir, configFileName), os.ReadCreateMode)
+// if err != nil {
+// 	log.Fatal(err)
+// }
+
+// rawContent, err := io.ReadAll(cfgF)
+// if err != nil {
+// 	log.Fatal(err)
+// }
+// content := string(rawContent)
+// if content == "" {
+// 	// TODO: Marshal savedConfigs and write it instead of {}
+// 	content = "{}"
+// 	cfgF, err := os.OpenFile(path.Join(jarvisDir, configFileName), os.AppendMode)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	if _, err := io.WriteString(cfgF, content); err != nil {
+// 		log.Fatal(err)
+// 	}
+// }
+// if err := json.Unmarshal([]byte(content), savedConfigs); err != nil {
+// 	log.Fatal(err)
+// }
+// }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math"
 
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/sashabaranov/go-openai"
@@ -70,16 +69,4 @@ func (c *chat) prompt(prompt interface{}, replyAnswer interface{}, options *chat
 
 func (c *chat) appendMessage(chat *openai.ChatCompletionMessage) {
 	c.messages = append(c.messages, *chat)
-}
-
-func (c *chat) calculateTokens() int {
-	const tokensPer1000Chars = 1333.33
-
-	characters := 0
-	for _, m := range c.messages {
-		characters += len(m.Content)
-	}
-
-	tokens := int(math.Ceil(float64(characters) / 1000 * tokensPer1000Chars))
-	return tokens
 }
