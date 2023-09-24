@@ -15,6 +15,7 @@ import (
 type pgsService struct {
 	clinet *openai.Client
 
+	Screen         *models.Screen
 	ConfigProvider cfgport.CfgProvider
 	runner         runnerport.PgsRunner
 	interactor     interactorport.Interactor
@@ -26,6 +27,7 @@ func NewPgsService(req *srvport.PgsServiceReq) srvport.PgsService {
 	return &pgsService{
 		clinet: openai.NewClient(req.ConfigProvider.GetConfigs().Token),
 
+		Screen:         &models.Screen{},
 		ConfigProvider: req.ConfigProvider,
 		runner:         req.Runner,
 		chat:           req.Chat,
@@ -61,7 +63,7 @@ func (b *pgsService) RunInteractiveChat() error {
 	for {
 		b.history.SaveReply(reply)
 
-		prompt := &models.PgsPrompt{}
+		prompt := &models.PgsPrompt{Screen: b.Screen.GetScreen()}
 
 		if reply.ReplyToUser != "" {
 			b.interactor.Message(reply.ReplyToUser, b.chat.CountTokens())

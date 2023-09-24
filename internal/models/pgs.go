@@ -18,11 +18,6 @@ type PgsPrompt struct {
 	LastQueryResult *PgsScriptResult `json:"LastQueryResult"`
 }
 
-type PgsScreen struct {
-	Width  int `json:"Width"`
-	Height int `json:"Height"`
-}
-
 type PgsScriptResult struct {
 	RunnerPgsResult *PgsRunnerResponse `json:"RunnerPgsResult"`
 }

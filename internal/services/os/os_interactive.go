@@ -19,6 +19,7 @@ type osService struct {
 	clinet             *openai.Client
 	scriptCrashedTimes int
 
+	Screen         *models.Screen
 	ConfigProvider cfgport.CfgProvider
 	runner         runnerport.OSRunner
 	chat           chatport.Chat
@@ -31,6 +32,7 @@ func NewOSService(req *srvport.OSServiceReq) srvport.OSService {
 		clinet:             openai.NewClient(req.ConfigProvider.GetConfigs().Token),
 		scriptCrashedTimes: 0,
 
+		Screen:         &models.Screen{},
 		ConfigProvider: req.ConfigProvider,
 		runner:         req.Runner,
 		chat:           req.Chat,
@@ -69,7 +71,7 @@ func (b *osService) RunInteractiveChat() (err error) {
 	for {
 		b.history.SaveReply(reply)
 
-		prompt := &models.OSPrompt{}
+		prompt := &models.OSPrompt{Screen: b.Screen.GetScreen()}
 
 		if reply.ReplyToUser != "" {
 			b.interactor.Message(reply.ReplyToUser, b.chat.CountTokens())
@@ -91,6 +93,7 @@ func (b *osService) RunInteractiveChat() (err error) {
 
 	SendPrompt:
 		b.history.SavePrompt(prompt)
+		fmt.Println(prompt.Screen)
 		if err := b.chat.Prompt(prompt, reply); err != nil {
 			b.interactor.Error(err)
 			clientErrReport := "Client error report: failed to process reply. Error:" + err.Error()

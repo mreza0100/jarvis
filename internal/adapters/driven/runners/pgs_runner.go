@@ -55,7 +55,6 @@ func (r *pgsRunner) ExecScript(req *models.PgsRunnerRequest) (*models.PgsRunnerR
 func (r *pgsRunner) scanResult(rows *sql.Rows) (result *models.QueryResult, err error) {
 	result = new(models.QueryResult)
 
-	fmt.Println(rows.Columns())
 	result.Columns, err = rows.Columns()
 	if err != nil {
 		return nil, err
