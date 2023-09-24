@@ -37,7 +37,7 @@ func (c *chat) RawPrompt(rawPrompt string, replyAnswer chatport.Reply, options *
 	chat, err := c.clinet.CreateChatCompletion(
 		ctx,
 		openai.ChatCompletionRequest{
-			Model:    openai.GPT3Dot5Turbo16K,
+			Model:    "gpt-3.5-turbo-0613",
 			Messages: c.messages,
 		},
 	)
