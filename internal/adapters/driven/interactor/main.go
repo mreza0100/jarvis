@@ -2,6 +2,7 @@ package interactor
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -60,7 +61,7 @@ func (i *interactor) log(color color, title string, message any) {
 	i.setColor(color)
 	defer i.unsetColor()
 
-	fmt.Printf("%s:\n%+v\n", title, message)
+	fmt.Printf("%s\n%+v\n", title, message)
 }
 
 func (i *interactor) logToken(color color, tokens int) {
@@ -70,13 +71,16 @@ func (i *interactor) logToken(color color, tokens int) {
 	fmt.Printf("Tokens Used: %d\n", tokens)
 }
 
+func (i *interactor) Error(err error) {
+	i.log(colorRed, "\n", err.Error())
+}
+
 func (i *interactor) Message(message string, usedTokens int) {
 	width, _, err := tools.GetTerminalSize()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-
 	renderedMarkdown := markdown.Render(message, width, 0)
 	i.logToken(colorYellow, usedTokens)
 	i.log(colorCyan, "\n", string(renderedMarkdown))
@@ -94,7 +98,11 @@ func (i *interactor) Script(script interface{}) {
 
 func (i *interactor) ScriptResults(result interface{}) {
 	if i.mode.IsDev() {
-		i.log(colorBlue, "Script Results", result)
+		jsonResult, err := json.Marshal(result)
+		if err != nil {
+			log.Fatal(err)
+		}
+		i.log(colorBlue, "Script Results", string(jsonResult))
 	}
 }
 

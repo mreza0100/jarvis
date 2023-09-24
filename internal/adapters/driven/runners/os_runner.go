@@ -30,12 +30,14 @@ func (b *osRunner) ExecScript(req *models.OSRunnerRequest) (*models.OSRunnerResu
 				return &models.OSRunnerResult{
 					StatusCode: status.ExitStatus(),
 					Stdout:     output,
-				}, err
+					Stderr:     err.Error(),
+				}, nil
 			}
 		}
 		return &models.OSRunnerResult{
-			StatusCode: 0,
+			StatusCode: -1,
 			Stdout:     output,
+			Stderr:     err.Error(),
 		}, err
 	}
 

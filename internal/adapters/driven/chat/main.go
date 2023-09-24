@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
+	"github.com/pkg/errors"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -61,7 +62,7 @@ func (c *chat) Prompt(prompt interface{}, replyAnswer chatport.Reply, optionsArg
 func (c *chat) prompt(prompt interface{}, replyAnswer chatport.Reply, options *chatport.PromptOptions) error {
 	rawPrompt, err := json.Marshal(prompt)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to parse jarvis json reply, Jarvis must provide a valid json")
 	}
 	return c.RawPrompt(string(rawPrompt), replyAnswer, options)
 }

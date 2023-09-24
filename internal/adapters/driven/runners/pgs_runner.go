@@ -27,13 +27,14 @@ func NewPgsRunner(req *PgsRunnerReq) runnerport.PgsRunner {
 }
 
 func (r *pgsRunner) ExecScript(req *models.PgsRunnerRequest) (*models.PgsRunnerResponse, error) {
-	rows, err := r.conn.Query(req.Query)
-	if err != nil {
-		return nil, err
-	}
-
 	resultSets := &models.PgsRunnerResponse{
 		QueryResponses: make([]*models.QueryResult, 0, 5),
+	}
+
+	rows, err := r.conn.Query(req.Query)
+	if err != nil {
+		resultSets.Err = err
+		return resultSets, nil
 	}
 
 	isFirst := true
@@ -41,7 +42,9 @@ func (r *pgsRunner) ExecScript(req *models.PgsRunnerRequest) (*models.PgsRunnerR
 		isFirst = false
 		result, err := r.scanResult(rows)
 		if err != nil {
-			return nil, err
+			return &models.PgsRunnerResponse{
+				Err: err,
+			}, nil
 		}
 		resultSets.QueryResponses = append(resultSets.QueryResponses, result)
 	}
@@ -85,7 +88,7 @@ func (r *pgsRunner) scanResult(rows *sql.Rows) (result *models.QueryResult, err 
 	}
 
 	if err := rows.Err(); err != nil {
-		result.Err = errors.Wrap(err, "Error iterating over rows:")
+		result.Err = errors.Wrap(err, "Error iterating over rows")
 	}
 	for rows.Next() {
 		columnValues := make([]any, len(result.Columns))

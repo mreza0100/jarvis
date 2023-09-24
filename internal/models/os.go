@@ -21,6 +21,7 @@ type OSPrompt struct {
 
 type OSRunnerResult struct {
 	Stdout     string `json:"Stdout"`
+	Stderr     string `json:"Stderr"`
 	StatusCode int    `json:"StatusCode"`
 }
 

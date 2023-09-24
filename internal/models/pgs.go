@@ -42,6 +42,7 @@ type ColumnType struct {
 }
 
 type PgsRunnerResponse struct {
+	Err            error          `json:"Err"`
 	QueryResponses []*QueryResult `json:"PgsRunnerResponse"`
 }
 

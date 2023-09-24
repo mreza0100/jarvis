@@ -8,6 +8,7 @@ import (
 	"github.com/mreza0100/jarvis/internal/ports/interactorport"
 	runnerport "github.com/mreza0100/jarvis/internal/ports/runnerport"
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
+	"github.com/pkg/errors"
 	openai "github.com/sashabaranov/go-openai"
 )
 
@@ -80,17 +81,14 @@ func (b *pgsService) RunInteractiveChat() error {
 			}
 		}
 
+	SendPrompt:
 		b.history.SavePrompt(prompt)
 		if err := b.chat.Prompt(prompt, reply); err != nil {
-			clientPrompt := "client crash, error: " + err.Error()
-			prompt := &models.PgsPrompt{
-				UserPrompt:   nil,
-				ClientPrompt: &clientPrompt,
-			}
-
-			if err := b.chat.Prompt(prompt, reply); err != nil {
-				return err
-			}
+			clientErrReport := errors.Wrap(err, "Client error report: failed to process reply. Error:")
+			clientErrReportStr := clientErrReport.Error()
+			b.interactor.Error(clientErrReport)
+			prompt.ClientPrompt = &clientErrReportStr
+			goto SendPrompt
 		}
 		b.interactor.Reply(reply)
 	}

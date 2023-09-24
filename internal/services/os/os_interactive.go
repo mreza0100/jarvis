@@ -89,9 +89,13 @@ func (b *osService) RunInteractiveChat() (err error) {
 			}
 		}
 
+	SendPrompt:
 		b.history.SavePrompt(prompt)
 		if err := b.chat.Prompt(prompt, reply); err != nil {
-			return err
+			b.interactor.Error(err)
+			clientErrReport := "Client error report: failed to process reply. Error:" + err.Error()
+			prompt.ClientPrompt = &clientErrReport
+			goto SendPrompt
 		}
 		b.interactor.Reply(reply)
 	}
@@ -99,40 +103,14 @@ func (b *osService) RunInteractiveChat() (err error) {
 
 func (b *osService) executeReplyScript(reply *models.OSReply) (*models.OSScriptResult, error) {
 	b.interactor.Script(reply.ScriptRequest)
-	defer func() { b.scriptCrashedTimes = 0 }()
 
 	result, err := b.runner.ExecScript(reply.ScriptRequest)
 	if err != nil {
-		b.scriptCrashedTimes++
-		crashPrompt := "last executed command crashed. recovering... try again"
-		reply := new(models.OSReply)
-		err = b.chat.Prompt(&models.OSPrompt{
-			ClientPrompt: &crashPrompt,
-			UserPrompt:   nil,
-			LastScriptResult: &models.OSScriptResult{
-				RunnerOSResult: &models.OSRunnerResult{
-					Stdout:     result.Stdout,
-					StatusCode: result.StatusCode,
-				},
-			},
-		}, reply)
-		if err != nil {
-			if b.scriptCrashedTimes > 5 {
-				return nil, err
-			}
-			if reply != nil && reply.ScriptRequest != nil {
-				return b.executeReplyScript(reply)
-			}
-			return nil, err
-		}
+		return nil, err
 	}
 
-	scriptResults := &models.OSScriptResult{
-		RunnerOSResult: &models.OSRunnerResult{
-			Stdout:     result.Stdout,
-			StatusCode: result.StatusCode,
-		},
-	}
+	scriptResults := &models.OSScriptResult{RunnerOSResult: result}
+
 	b.interactor.ScriptResults(scriptResults)
 
 	return scriptResults, nil

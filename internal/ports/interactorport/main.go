@@ -6,4 +6,5 @@ type Interactor interface {
 	Script(script interface{})
 	ScriptResults(result interface{})
 	Reply(response interface{})
+	Error(err error)
 }
