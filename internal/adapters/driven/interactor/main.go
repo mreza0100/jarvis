@@ -23,7 +23,7 @@ type interactor struct {
 	stderr io.Writer
 }
 
-type InteractorArg struct {
+type InteractorReq struct {
 	CfgProvider cfgport.CfgProvider
 
 	Stdin  io.Reader
@@ -31,13 +31,13 @@ type InteractorArg struct {
 	Stderr io.Writer
 }
 
-func NewInteractor(args InteractorArg) interactorport.Interactor {
+func NewInteractor(req InteractorReq) interactorport.Interactor {
 	return &interactor{
-		mode: args.CfgProvider.GetCfg().Mode,
+		mode: req.CfgProvider.GetConfigs().Mode,
 
-		stdin:  args.Stdin,
-		stdout: args.Stdout,
-		stderr: args.Stderr,
+		stdin:  req.Stdin,
+		stdout: req.Stdout,
+		stderr: req.Stderr,
 	}
 }
 

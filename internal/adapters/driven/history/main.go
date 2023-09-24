@@ -20,7 +20,7 @@ type history struct {
 }
 
 func NewHistory(cfgProvider cfgport.CfgProvider) historyport.History {
-	cfg := cfgProvider.GetCfg()
+	cfg := cfgProvider.GetConfigs()
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)

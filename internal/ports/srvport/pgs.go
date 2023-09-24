@@ -8,7 +8,7 @@ import (
 	runnerport "github.com/mreza0100/jarvis/internal/ports/runnerport"
 )
 
-type PgsServicesReq struct {
+type PgsServiceReq struct {
 	ConfigProvider cfgport.CfgProvider
 	Runner         runnerport.PgsRunner
 	Chat           chatport.Chat
@@ -17,9 +17,9 @@ type PgsServicesReq struct {
 }
 
 type PgsServices struct {
-	BootService PgsInteractiveService
+	PgsService PgsService
 }
 
-type PgsInteractiveService interface {
-	Start(modelName string) error
+type PgsService interface {
+	RunInteractiveChat() error
 }

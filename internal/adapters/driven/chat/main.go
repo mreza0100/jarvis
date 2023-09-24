@@ -25,7 +25,7 @@ func NewChat(req *NewChatReq) chatport.Chat {
 	}
 }
 
-func (c *chat) RawPrompt(rawPrompt string, replyAnswer interface{}, options *chatport.PromptOptions) error {
+func (c *chat) RawPrompt(rawPrompt string, replyAnswer chatport.Reply, options *chatport.PromptOptions) error {
 	ctx := context.Background()
 
 	c.appendMessage(&openai.ChatCompletionMessage{
@@ -53,12 +53,12 @@ func (c *chat) RawPrompt(rawPrompt string, replyAnswer interface{}, options *cha
 	return json.Unmarshal([]byte(rawReply), replyAnswer)
 }
 
-func (c *chat) Prompt(prompt interface{}, replyAnswer interface{}, optionsArg ...*chatport.PromptOptions) error {
+func (c *chat) Prompt(prompt interface{}, replyAnswer chatport.Reply, optionsArg ...*chatport.PromptOptions) error {
 	options := c.normalizeOptions(optionsArg...)
 	return c.prompt(prompt, replyAnswer, options)
 }
 
-func (c *chat) prompt(prompt interface{}, replyAnswer interface{}, options *chatport.PromptOptions) error {
+func (c *chat) prompt(prompt interface{}, replyAnswer chatport.Reply, options *chatport.PromptOptions) error {
 	rawPrompt, err := json.Marshal(prompt)
 	if err != nil {
 		return err

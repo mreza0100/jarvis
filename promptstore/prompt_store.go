@@ -1,4 +1,4 @@
-package templatestore
+package promptstore
 
 import "embed"
 

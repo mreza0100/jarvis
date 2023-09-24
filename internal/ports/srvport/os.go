@@ -8,7 +8,7 @@ import (
 	runnerport "github.com/mreza0100/jarvis/internal/ports/runnerport"
 )
 
-type OSServicesReq struct {
+type OSServiceReq struct {
 	ConfigProvider cfgport.CfgProvider
 	Runner         runnerport.OSRunner
 	Chat           chatport.Chat
@@ -17,9 +17,9 @@ type OSServicesReq struct {
 }
 
 type OSServices struct {
-	BootService OSInteractiveService
+	OSService OSService
 }
 
-type OSInteractiveService interface {
-	Start(modelName string) error
+type OSService interface {
+	RunInteractiveChat() error
 }

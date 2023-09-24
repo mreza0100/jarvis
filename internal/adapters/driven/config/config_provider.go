@@ -10,6 +10,7 @@ import (
 	"github.com/mreza0100/jarvis/internal/models"
 	"github.com/mreza0100/jarvis/internal/ports/cfgport"
 	"github.com/mreza0100/jarvis/pkg/os"
+	promptstore "github.com/mreza0100/jarvis/promptstore"
 )
 
 var configFileEmptySchehma = models.ConfigFile{
@@ -46,6 +47,16 @@ func NewConfigProvider(path *string) cfgport.CfgProvider {
 	return cfg
 }
 
+func (c *configProvider) LoadSavedFile(fileName string) (string, error) {
+	content, err := promptstore.ModelsFS.ReadFile(fileName)
+	if err != nil {
+		return "", err
+	}
+
+	templ := string(content)
+	return templ, nil
+}
+
 func (c *configProvider) RefreshCfg(path *string) *models.Configuration {
 	if path != nil {
 		c.loadConfigFile(*path)
@@ -55,7 +66,7 @@ func (c *configProvider) RefreshCfg(path *string) *models.Configuration {
 	return c.cfg
 }
 
-func (c *configProvider) GetCfg() *models.Configuration {
+func (c *configProvider) GetConfigs() *models.Configuration {
 	return c.cfg
 }
 

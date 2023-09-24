@@ -1,9 +1,10 @@
-package services
+package os_srvice
 
 import (
 	"fmt"
 
 	"github.com/mreza0100/jarvis/internal/models"
+	"github.com/mreza0100/jarvis/internal/ports/cfgport"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/mreza0100/jarvis/internal/ports/historyport"
 	"github.com/mreza0100/jarvis/internal/ports/interactorport"
@@ -14,36 +15,42 @@ import (
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
 )
 
-type osInteractiveSrv struct {
+type osService struct {
 	clinet             *openai.Client
 	scriptCrashedTimes int
 
-	runner     runnerport.OSRunner
-	chat       chatport.Chat
-	interactor interactorport.Interactor
-	history    historyport.History
+	ConfigProvider cfgport.CfgProvider
+	runner         runnerport.OSRunner
+	chat           chatport.Chat
+	interactor     interactorport.Interactor
+	history        historyport.History
 }
 
-func NewOSSrv(req *srvport.OSServicesReq) srvport.OSInteractiveService {
-	return &osInteractiveSrv{
-		clinet:             openai.NewClient(req.ConfigProvider.GetCfg().Token),
+func NewOSService(req *srvport.OSServiceReq) srvport.OSService {
+	return &osService{
+		clinet:             openai.NewClient(req.ConfigProvider.GetConfigs().Token),
 		scriptCrashedTimes: 0,
 
-		runner:     req.Runner,
-		chat:       req.Chat,
-		interactor: req.Interactor,
-		history:    req.History,
+		ConfigProvider: req.ConfigProvider,
+		runner:         req.Runner,
+		chat:           req.Chat,
+		interactor:     req.Interactor,
+		history:        req.History,
 	}
 }
 
-func (b *osInteractiveSrv) initLLMRole(prePrompt string) (*models.OSReply, error) {
+func (b *osService) initiateChat() (*models.OSReply, error) {
+	prePrompt, err := b.ConfigProvider.LoadSavedFile("os.gpt")
+	if err != nil {
+		return nil, err
+	}
 	prompt := &models.OSPrompt{
 		ClientPrompt: &prePrompt,
 	}
 	b.history.SavePrompt(prompt)
+
 	reply := new(models.OSReply)
-	err := b.chat.Prompt(prompt, reply)
-	if err != nil {
+	if err := b.chat.Prompt(prompt, reply); err != nil {
 		return nil, err
 	}
 	b.interactor.Reply(reply)
@@ -51,10 +58,10 @@ func (b *osInteractiveSrv) initLLMRole(prePrompt string) (*models.OSReply, error
 	return reply, nil
 }
 
-func (b *osInteractiveSrv) Start(prePrompt string) (err error) {
-	defer func() { fmt.Println("Start Defer, err:", err) }()
+func (b *osService) RunInteractiveChat() (err error) {
+	defer func() { fmt.Println("RunInteractiveChat Defer, err:", err) }()
 
-	reply, err := b.initLLMRole(prePrompt)
+	reply, err := b.initiateChat()
 	if err != nil {
 		return err
 	}
@@ -69,7 +76,7 @@ func (b *osInteractiveSrv) Start(prePrompt string) (err error) {
 		}
 
 		if reply.ScriptRequest != nil {
-			prompt.LastScriptResult, err = b.processScript(reply)
+			prompt.LastScriptResult, err = b.executeReplyScript(reply)
 			if err != nil {
 				return err
 			}
@@ -86,12 +93,11 @@ func (b *osInteractiveSrv) Start(prePrompt string) (err error) {
 		if err := b.chat.Prompt(prompt, reply); err != nil {
 			return err
 		}
-
 		b.interactor.Reply(reply)
 	}
 }
 
-func (b *osInteractiveSrv) processScript(reply *models.OSReply) (*models.OSScriptResult, error) {
+func (b *osService) executeReplyScript(reply *models.OSReply) (*models.OSScriptResult, error) {
 	b.interactor.Script(reply.ScriptRequest)
 	defer func() { b.scriptCrashedTimes = 0 }()
 
@@ -115,7 +121,7 @@ func (b *osInteractiveSrv) processScript(reply *models.OSReply) (*models.OSScrip
 				return nil, err
 			}
 			if reply != nil && reply.ScriptRequest != nil {
-				return b.processScript(reply)
+				return b.executeReplyScript(reply)
 			}
 			return nil, err
 		}

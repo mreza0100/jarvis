@@ -1,7 +1,8 @@
-package services
+package pgs_srvice
 
 import (
 	"github.com/mreza0100/jarvis/internal/models"
+	"github.com/mreza0100/jarvis/internal/ports/cfgport"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/mreza0100/jarvis/internal/ports/historyport"
 	"github.com/mreza0100/jarvis/internal/ports/interactorport"
@@ -10,28 +11,34 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
-type pgsInteractiveSrv struct {
+type pgsService struct {
 	clinet *openai.Client
 
-	runner     runnerport.PgsRunner
-	interactor interactorport.Interactor
-	history    historyport.History
-	chat       chatport.Chat
+	ConfigProvider cfgport.CfgProvider
+	runner         runnerport.PgsRunner
+	interactor     interactorport.Interactor
+	history        historyport.History
+	chat           chatport.Chat
 }
 
-func NewPgsSrv(req *srvport.PgsServicesReq) srvport.PgsInteractiveService {
-	return &pgsInteractiveSrv{
-		clinet: openai.NewClient(req.ConfigProvider.GetCfg().Token),
+func NewPgsService(req *srvport.PgsServiceReq) srvport.PgsService {
+	return &pgsService{
+		clinet: openai.NewClient(req.ConfigProvider.GetConfigs().Token),
 
-		runner:     req.Runner,
-		chat:       req.Chat,
-		interactor: req.Interactor,
-		history:    req.History,
+		ConfigProvider: req.ConfigProvider,
+		runner:         req.Runner,
+		chat:           req.Chat,
+		interactor:     req.Interactor,
+		history:        req.History,
 	}
 }
 
-func (b *pgsInteractiveSrv) initLLMRole(prePrompt string) (*models.PgsReply, error) {
-	prompt := &models.OSPrompt{
+func (b *pgsService) initiateChat() (*models.PgsReply, error) {
+	prePrompt, err := b.ConfigProvider.LoadSavedFile("postgres.gpt")
+	if err != nil {
+		return nil, err
+	}
+	prompt := &models.PgsPrompt{
 		ClientPrompt: &prePrompt,
 	}
 	b.history.SavePrompt(prompt)
@@ -44,8 +51,8 @@ func (b *pgsInteractiveSrv) initLLMRole(prePrompt string) (*models.PgsReply, err
 	return reply, nil
 }
 
-func (b *pgsInteractiveSrv) Start(prePrompt string) (err error) {
-	reply, err := b.initLLMRole(prePrompt)
+func (b *pgsService) RunInteractiveChat() error {
+	reply, err := b.initiateChat()
 	if err != nil {
 		return err
 	}
@@ -60,7 +67,7 @@ func (b *pgsInteractiveSrv) Start(prePrompt string) (err error) {
 		}
 
 		if reply.QueryRequest != nil {
-			prompt.LastQueryResult, err = b.processScript(reply.QueryRequest)
+			prompt.LastQueryResult, err = b.executeReplyQuery(reply.QueryRequest)
 			if err != nil {
 				return err
 			}
@@ -89,10 +96,10 @@ func (b *pgsInteractiveSrv) Start(prePrompt string) (err error) {
 	}
 }
 
-func (b *pgsInteractiveSrv) processScript(scriptRequest *models.PgsRunnerRequest) (*models.PgsScriptResult, error) {
-	b.interactor.Script(scriptRequest)
+func (b *pgsService) executeReplyQuery(queryRequest *models.PgsRunnerRequest) (*models.PgsScriptResult, error) {
+	b.interactor.Script(queryRequest)
 
-	runnerResult, err := b.runner.ExecScript(scriptRequest)
+	runnerResult, err := b.runner.ExecScript(queryRequest)
 	if err != nil {
 		return nil, err
 	}
