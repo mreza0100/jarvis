@@ -71,8 +71,8 @@ func (b *osService) RunInteractiveChat() (err error) {
 
 		prompt := &models.OSPrompt{}
 
-		if reply.MessageToUser != "" {
-			b.interactor.Message(reply.MessageToUser, b.chat.CountTokens())
+		if reply.ReplyToUser != "" {
+			b.interactor.Message(reply.ReplyToUser, b.chat.CountTokens())
 		}
 
 		if reply.ScriptRequest != nil {

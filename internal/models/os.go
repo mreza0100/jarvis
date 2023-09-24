@@ -1,8 +1,8 @@
 package models
 
 type OSReply struct {
-	MessageToUser     string           `json:"messageToUser"`
-	WaitForUserPrompt bool             `json:"waitForUserPrompt"`
+	ReplyToUser       string           `json:"ReplyToUser"`
+	WaitForUserPrompt bool             `json:"WaitForUserPrompt"`
 	ScriptRequest     *OSRunnerRequest `json:"Script"`
 	TokensUsed        int              `json:"_"`
 }
