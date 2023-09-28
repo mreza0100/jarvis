@@ -1,7 +1,7 @@
 version: "2.2"
 
 services:
-      # docker container exec -it pg-jarvis-test bash -c 'PGPASSWORD=mamadspass psql -U mamad -h 30.0.0.10 mamad_db'
+      # docker container exec -it pg-jarvis-test bash -c 'PGPASSWORD=mamadspass psql -U mamad -h 50.0.0.10 mamad_db'
       pg-jarvis-test:
             image: postgres:15.4
             container_name: pg-jarvis-test
@@ -12,9 +12,11 @@ services:
                   - POSTGRES_USER=mamad
                   - POSTGRES_PASSWORD=mamadspass
                   - POSTGRES_DB=mamad_db
-            networks:
-                  service_dependency_net:
-                        ipv4_address: 30.0.0.10
+            # networks:
+            #       service_dependency_net:
+            #             ipv4_address: 50.0.0.10
+            ports:
+                  - "5432:5432"
             volumes:
                   - /dev/shm/pg-jarvis-test:/var/lib/postgresql/data
             healthcheck:
@@ -22,10 +24,10 @@ services:
                   interval: 10s
                   timeout: 3s
                   retries: 3
-networks:
-      service_dependency_net:
-            driver: bridge
-            name: pg_jarvis_test_dependency_net
-            ipam:
-                  config:
-                        - subnet: 30.0.0.0/24
+# networks:
+#       service_dependency_net:
+#             driver: bridge
+#             name: pg_jarvis_dependency_net
+#             ipam:
+#                   config:
+#                         - subnet: 50.0.0.0/24
