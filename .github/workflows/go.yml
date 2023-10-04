@@ -28,6 +28,9 @@ jobs:
         run: GOOS=linux GOARCH=386 go build -o jarvis-linux-386
       - name: Build for macOS 64-bit
         run: GOOS=darwin GOARCH=amd64 go build -o jarvis-macos-amd64
+      - name: lets see
+        run: ls -ltrh .
 
+        
       - name: Test
         run: go test -v ./...
