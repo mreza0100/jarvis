@@ -28,12 +28,6 @@ jobs:
         run: GOOS=linux GOARCH=386 go build -o jarvis-linux-386
       - name: Build for macOS 64-bit
         run: GOOS=darwin GOARCH=amd64 go build -o jarvis-macos-amd64
-      - name: Build for macOS 32-bit
-        run: GOOS=darwin GOARCH=386 go build -o jarvis-macos-386
-      - name: Build for FreeBSD 64-bit
-        run: GOOS=freebsd GOARCH=amd64 go build -o jarvis-freebsd-amd64
-      - name: Build for FreeBSD 32-bit
-        run: GOOS=freebsd GOARCH=386 go build -o jarvis-freebsd-386
 
       - name: Test
         run: go test -v ./...
