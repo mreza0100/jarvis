@@ -1,0 +1,27 @@
+{
+	"postgres": {
+		"config": {
+			"token": {
+				"env_name": "OPEN_API_KEY"
+			},
+			"model": "gpt-3.5-turbo-16k",
+			"temperature": 1
+		},
+		"connection": {
+			"host": "30.0.0.10",
+			"port": 5432,
+			"username": "mamad",
+			"password": "mamadspass",
+			"database": "mamad_db"
+		}
+	},
+	"os": {
+		"config": {
+			"token": {
+				"value": "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"
+			},
+			"model": "gpt-4",
+			"temperature": 1
+		}
+	}
+}

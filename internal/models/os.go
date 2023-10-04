@@ -28,3 +28,7 @@ type OSRunnerResult struct {
 type OSScriptResult struct {
 	RunnerOSResult *OSRunnerResult `json:"RunnerOSResult"`
 }
+
+type OSConfig struct {
+	Config *ChatConfig `json:"config"`
+}

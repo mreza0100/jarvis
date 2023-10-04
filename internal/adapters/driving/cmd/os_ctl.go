@@ -10,18 +10,18 @@ import (
 	"github.com/mreza0100/jarvis/internal/adapters/driven/runners"
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
 	os_srvice "github.com/mreza0100/jarvis/internal/services/os"
-	"github.com/sashabaranov/go-openai"
 	"github.com/urfave/cli/v2"
 )
 
-func (c *cmd) OSController(_ *cli.Context) error {
-	cfgProvider := config.NewConfigProvider(nil)
-	history := history.NewHistory(cfgProvider)
-	runner := runners.NewOSRunner()
+func (c *cmd) OSController(ctx *cli.Context) error {
+	cfgProvider := config.NewConfigProvider(ctx.Args().Get(0))
+	configs := cfgProvider.GetConfigs()
 
-	cfg := cfgProvider.GetConfigs()
+	history := history.NewHistory(cfgProvider)
+
+	runner := runners.NewOSRunner()
 	chat := chat.NewChat(&chat.NewChatReq{
-		Clinet: openai.NewClient(cfg.Token),
+		ChatConfigs: configs.ConfigFile.OS.Config,
 	})
 	interactor := interactor.NewInteractor(interactor.InteractorReq{
 		CfgProvider: cfgProvider,

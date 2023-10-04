@@ -1,5 +1,9 @@
 package models
 
+import (
+	"os"
+)
+
 type Mode uint8
 
 func (m Mode) IsDev() bool {
@@ -22,12 +26,29 @@ var Modes = struct {
 type Configuration struct {
 	RootDirName    string
 	HistoryDirName string
-	Token          string
 	Mode           Mode
 
 	ConfigFile *ConfigFile
 }
 
+type ChatConfig struct {
+	Token struct {
+		EnvName string `json:"env_name"`
+		Value   string `json:"value"`
+	} `json:"token"`
+	Model       string  `json:"model"`
+	Temperature float32 `json:"temperature"`
+}
+
+func (c *ChatConfig) GetToken() string {
+	if c.Token.Value != "" {
+		return c.Token.Value
+	}
+
+	return os.Getenv(c.Token.EnvName)
+}
+
 type ConfigFile struct {
-	PostgresConfig PostgresConfig `json:"postgres"`
+	Postgres *PostgresConfig `json:"postgres"`
+	OS       *OSConfig       `json:"os"`
 }

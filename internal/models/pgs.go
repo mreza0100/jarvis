@@ -50,5 +50,7 @@ type PostgresConnConfig struct {
 }
 
 type PostgresConfig struct {
-	PostgresConnConfig PostgresConnConfig `json:"connection"`
+	Config *ChatConfig `json:"config"`
+
+	PostgresConnConfig *PostgresConnConfig `json:"connection"`
 }

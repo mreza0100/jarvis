@@ -5,25 +5,30 @@ import (
 	"encoding/json"
 	"math"
 
+	"github.com/mreza0100/jarvis/internal/models"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/pkg/errors"
 	"github.com/sashabaranov/go-openai"
 )
 
 type chat struct {
-	clinet   openai.Client
+	config   *models.ChatConfig
+	clinet   *openai.Client
 	messages []openai.ChatCompletionMessage
 }
 
 type NewChatReq struct {
-	Clinet *openai.Client
+	ChatConfigs *models.ChatConfig
 }
 
 func NewChat(req *NewChatReq) chatport.Chat {
-	return &chat{
-		clinet:   *req.Clinet,
+	ch := &chat{
+		config:   req.ChatConfigs,
+		clinet:   openai.NewClient(req.ChatConfigs.GetToken()),
 		messages: make([]openai.ChatCompletionMessage, 0, 5),
 	}
+
+	return ch
 }
 
 func (c *chat) RawPrompt(rawPrompt string, replyAnswer chatport.Reply, options *chatport.PromptOptions) error {
@@ -37,8 +42,10 @@ func (c *chat) RawPrompt(rawPrompt string, replyAnswer chatport.Reply, options *
 	chat, err := c.clinet.CreateChatCompletion(
 		ctx,
 		openai.ChatCompletionRequest{
-			Model:    "gpt-3.5-turbo-0613",
 			Messages: c.messages,
+
+			Model:       c.config.Model,
+			Temperature: c.config.Temperature,
 		},
 	)
 	if err != nil {
