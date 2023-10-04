@@ -1,0 +1,39 @@
+# This workflow will build a golang project for multiple Unix-like OSs
+name: Go
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.20'
+
+      - name: Build for Linux 64-bit
+        run: GOOS=linux GOARCH=amd64 go build -o jarvis-linux-amd64
+      - name: Build for Linux 32-bit
+        run: GOOS=linux GOARCH=386 go build -o jarvis-linux-386
+      - name: Build for macOS 64-bit
+        run: GOOS=darwin GOARCH=amd64 go build -o jarvis-macos-amd64
+      - name: Build for macOS 32-bit
+        run: GOOS=darwin GOARCH=386 go build -o jarvis-macos-386
+      - name: Build for FreeBSD 64-bit
+        run: GOOS=freebsd GOARCH=amd64 go build -o jarvis-freebsd-amd64
+      - name: Build for FreeBSD 32-bit
+        run: GOOS=freebsd GOARCH=386 go build -o jarvis-freebsd-386
+
+      - name: Test
+        run: go test -v ./...
