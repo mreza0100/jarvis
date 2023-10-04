@@ -29,7 +29,7 @@ jobs:
       - name: Build for macOS 64-bit
         run: GOOS=darwin GOARCH=amd64 go build -o jarvis-macos-amd64
       - name: lets see
-        run: ls -ltrh .
+        run: echo '${{ secrets.GITHUB_TOKEN }}'
 
         
       - name: Test
