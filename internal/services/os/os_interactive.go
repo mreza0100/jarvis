@@ -9,6 +9,7 @@ import (
 	"github.com/mreza0100/jarvis/internal/ports/historyport"
 	"github.com/mreza0100/jarvis/internal/ports/interactorport"
 	runnerport "github.com/mreza0100/jarvis/internal/ports/runnerport"
+	"github.com/pkg/errors"
 
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
 )
@@ -90,9 +91,10 @@ func (b *osService) RunInteractiveChat() (err error) {
 	SendPrompt:
 		b.history.SavePrompt(prompt)
 		if err := b.chat.Prompt(prompt, reply); err != nil {
-			b.interactor.Error(err)
-			clientErrReport := "Client error report: failed to process reply. Error:" + err.Error()
-			prompt.ClientPrompt = &clientErrReport
+			clientErrReport := errors.Wrap(err, "Client error report: failed to process reply. Error:")
+			clientErrReportStr := clientErrReport.Error()
+			b.interactor.Error(clientErrReport)
+			prompt.ClientPrompt = &clientErrReportStr
 			goto SendPrompt
 		}
 		b.interactor.Reply(reply)
