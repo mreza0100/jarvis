@@ -1,6 +1,8 @@
-# Jarvis CLI Powered by ChatGPT
+# GPT Jarvis CLI
 
-The Jarvis CLI is a versatile command-line tool powered by ChatGPT that brings an interactive assistant to your terminal. It can help you with a wide range of tasks, from managing your operating system to working with PostgreSQL databases.
+The Jarvis CLI is a versatile command-line tool powered by `ChatGPT` that brings an interactive assistant to your terminal. It can help you with a wide range of tasks, from managing your operating system to working with PostgreSQL databases.
+
+<!-- TODO: it designed to do complex tasks -->
 
 ## Installation
 
@@ -14,42 +16,50 @@ go install github.com/mreza0100/jarvis
 
 Before you can start using Jarvis, you'll need an OpenAI API key. You can obtain one from the OpenAI platform. Once you have your API key, you can use Jarvis for various tasks.
 
-### Interactive OS Assistance
+You can obtain the API key from [here](https://platform.openai.com/account/api-keys)
 
-Run the following command to start an interactive session with Jarvis for general OS assistance:
+## Commands
 
-```bash
-OPEN_API_KEY="<Your-Token>"
-jarvis interactive os
+### OS assistante:
+
+```
+jarvis [interactive/i] os ./.jarvisrc.json # will create config file if not exist
 ```
 
-### Interactive PostgreSQL Assistant
+### Postgres assistante:
 
-To interact with Jarvis for PostgreSQL tasks, use the following command. If a configuration file doesn't exist, Jarvis will create a template for you to fill out:
-
-```bash
-OPEN_API_KEY="<Your-Token>"
-jarvis interactive postgres ./.jarvis.json
+```
+jarvis [interactive/i] [postgres/pgs] ./.jarvisrc.json # will create config file if not exist
 ```
 
-## Usage Examples
+## Config File (.jarvisrc.json)
 
-Here are some examples of tasks you can perform with Jarvis:
-
-### Operating System Assistance
-
-- Manage your files and directories.
-- Execute system commands and scripts.
-- Retrieve information about your system.
-
-### PostgreSQL Interaction
-
-- Execute SQL queries on your PostgreSQL database.
-- Retrieve and manage database records.
-- Perform database maintenance tasks.
-
----
-
-**Note:** Please make sure to replace `<Your-Token>` with your actual OpenAI API key when using Jarvis.
-
-For any issues, questions, or suggestions, feel free to [create an issue](https://github.com/mreza0100/jarvis/issues) on GitHub.
+```
+{
+	"postgres": {
+		"config": {
+			"token": {
+				"env_name": "OPEN_API_KEY"
+			},
+			"model": "gpt-3.5-turbo-16k",
+			"temperature": 1
+		},
+		"connection": {
+			"host": "localhost",
+			"port": 5432,
+			"username": "username",
+			"password": "password",
+			"database": "databasename"
+		}
+	},
+	"os": {
+		"config": {
+			"token": {
+				"value": "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"
+			},
+			"model": "gpt-4",
+			"temperature": 1
+		}
+	}
+}
+```
