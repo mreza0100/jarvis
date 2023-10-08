@@ -25,10 +25,15 @@ You can obtain the API key from [here](https://platform.openai.com/account/api-k
 ```
 jarvis [interactive/i] os ./.jarvisrc.json # will create config file if not exist
 ```
+![Example-1](https://github.com/mreza0100/jarvis/assets/59161329/890c6884-e087-4d8e-ae7a-c64e7706cb7a)
+![Example-2](https://github.com/mreza0100/jarvis/assets/59161329/10aac14a-f889-4357-a60b-1b6c84f4ec04)
+
+
 
 ### Postgres assistante:
 
-```
+```![Uploading Screenshot from 2023-10-09 01-32-09.png…]()
+
 jarvis [interactive/i] [postgres/pgs] ./.jarvisrc.json # will create config file if not exist
 ```
 
