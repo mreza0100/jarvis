@@ -1,47 +1,23 @@
 # GPT Jarvis CLI
 
-The Jarvis CLI is a versatile command-line tool powered by `ChatGPT` that brings an interactive assistant to your terminal. It can help you with a wide range of tasks, from managing your operating system to working with PostgreSQL databases.
+The GPT Jarvis CLI is a versatile command-line tool powered by ChatGPT, designed for complex tasks in your terminal.
 
-<!-- TODO: it designed to do complex tasks -->
 
 ## Installation
 
-You can install the Jarvis CLI using the following command:
+You can easily install the Jarvis CLI using the following command:
 
 ```bash
 go install github.com/mreza0100/jarvis
 ```
 
-## Getting Started
+# Getting Started
 
-Before you can start using Jarvis, you'll need an OpenAI API key. You can obtain one from the OpenAI platform. Once you have your API key, you can use Jarvis for various tasks.
+## Step 1: Obtaining Your API Token
+Before diving into Jarvis's capabilities, you'll need to obtain an OpenAI API key. Simply head over to the OpenAI platform to acquire your key. This key is essential for unlocking the full potential of Jarvis.
 
-You can obtain the API key from [here](https://platform.openai.com/account/api-keys)
-
-## Commands
-
-### OS assistante:
-
-```
-jarvis [interactive/i] os ./.jarvisrc.json # will create config file if not exist
-```
-
-![](https://github.com/mreza0100/jarvis/assets/59161329/1a33296d-76ef-4509-8eed-bf8f0337a1b7)
-
-
-
-### Postgres assistante:
-
-```
-
-jarvis [interactive/i] [postgres/pgs] ./.jarvisrc.json # will create config file if not exist
-```
-
-![](https://github.com/mreza0100/jarvis/assets/59161329/34f646c9-9b8c-4d8c-a769-0b12d1ec0340)
-
-
-
-## Config File (.jarvisrc.json)
+## Step 2: Creating a Configuration File
+To use Jarvis, you need to create a configuration file named .jarvisrc.json. Here's an example of what it should look like:
 
 ```
 {
@@ -72,3 +48,25 @@ jarvis [interactive/i] [postgres/pgs] ./.jarvisrc.json # will create config file
 	}
 }
 ```
+In this file, you can customize settings for both the OS and PostgreSQL assistants, including the API token you obtained in Step 1.
+
+
+## Step 3: Running Jarvis Commands
+Now that you have your API token and configuration file set up, you're ready to start using Jarvis. Here are a few example commands:
+
+### OS Assistant:
+To engage the OS assistant, execute the following command:
+
+```
+jarvis interactive os ./.jarvisrc.json # This command creates a config file if it doesn't exist
+```
+![](https://github-production-user-asset-6210df.s3.amazonaws.com/59161329/273481589-1a33296d-76ef-4509-8eed-bf8f0337a1b7.png)
+
+### PostgreSQL Assistant:
+To utilize the PostgreSQL assistant, execute the following command:
+```
+jarvis interactive postgres ./.jarvisrc.json # This command creates a config file if it doesn't exist
+```
+![](https://github-production-user-asset-6210df.s3.amazonaws.com/59161329/273481379-34f646c9-9b8c-4d8c-a769-0b12d1ec0340.png)
+
+Unlock the potential of your terminal with the GPT Jarvis CLI!
