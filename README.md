@@ -25,8 +25,8 @@ You can obtain the API key from [here](https://platform.openai.com/account/api-k
 ```
 jarvis [interactive/i] os ./.jarvisrc.json # will create config file if not exist
 ```
-![Example-1](https://github.com/mreza0100/jarvis/assets/59161329/890c6884-e087-4d8e-ae7a-c64e7706cb7a)
-![Example-2](https://github.com/mreza0100/jarvis/assets/59161329/10aac14a-f889-4357-a60b-1b6c84f4ec04)
+
+![](https://github.com/mreza0100/jarvis/assets/59161329/1a33296d-76ef-4509-8eed-bf8f0337a1b7)
 
 
 
@@ -37,7 +37,7 @@ jarvis [interactive/i] os ./.jarvisrc.json # will create config file if not exis
 jarvis [interactive/i] [postgres/pgs] ./.jarvisrc.json # will create config file if not exist
 ```
 
-![postgres-example](https://github.com/mreza0100/jarvis/assets/59161329/34f646c9-9b8c-4d8c-a769-0b12d1ec0340)
+![](https://github.com/mreza0100/jarvis/assets/59161329/34f646c9-9b8c-4d8c-a769-0b12d1ec0340)
 
 
 
