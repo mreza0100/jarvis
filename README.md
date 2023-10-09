@@ -64,7 +64,7 @@ jarvis [interactive/i] [postgres/pgs] ./.jarvisrc.json # will create config file
 	"os": {
 		"config": {
 			"token": {
-				"value": "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"
+				"value": "sk-xxxx"
 			},
 			"model": "gpt-4",
 			"temperature": 1
