@@ -32,10 +32,14 @@ jarvis [interactive/i] os ./.jarvisrc.json # will create config file if not exis
 
 ### Postgres assistante:
 
-```![Uploading Screenshot from 2023-10-09 01-32-09.png…]()
+```
 
 jarvis [interactive/i] [postgres/pgs] ./.jarvisrc.json # will create config file if not exist
 ```
+
+![postgres-example](https://github.com/mreza0100/jarvis/assets/59161329/34f646c9-9b8c-4d8c-a769-0b12d1ec0340)
+
+
 
 ## Config File (.jarvisrc.json)
 
