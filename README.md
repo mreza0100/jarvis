@@ -34,34 +34,35 @@ This command creates a default configuration file in the `.jarvis` directory und
 
 A typical configuration file looks like this:
 
-````json
+```json
 {
-    "postgres": {
-        "config": {
-            "token": {
-                "env_name": "OPENAI_API_KEY"
-            },
-            "model": "gpt-4",
-            "temperature": 1
-        },
-        "connection": {
-            "host": "localhost",
-            "port": 5432,
-            "username": "mamad",
-            "password": "mamadspass",
-            "database": "mamad_db"
-        }
-    },
-    "os": {
-        "config": {
-            "token": {
-                "env_name": "OPENAI_API_KEY"
-            },
-            "model": "gpt-4",
-            "temperature": 1
-        }
-    }
+	"postgres": {
+		"config": {
+			"token": {
+				"env_name": "OPENAI_API_KEY"
+			},
+			"model": "gpt-4",
+			"temperature": 1
+		},
+		"connection": {
+			"host": "localhost",
+			"port": 5432,
+			"username": "mamad",
+			"password": "mamadspass",
+			"database": "mamad_db"
+		}
+	},
+	"os": {
+		"config": {
+			"token": {
+				"env_name": "OPENAI_API_KEY"
+			},
+			"model": "gpt-4",
+			"temperature": 1
+		}
+	}
 }
+```
 
 ### Step 3: Running Jarvis
 
@@ -71,7 +72,7 @@ To use the OS assistant, execute:
 
 ```bash
 jarvis interactive os
-````
+```
 
 #### PostgreSQL Assistant
 
