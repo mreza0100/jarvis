@@ -7,8 +7,8 @@ import (
 	"github.com/mreza0100/jarvis/internal/ports/cfgport"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/mreza0100/jarvis/internal/ports/historyport"
-	"github.com/mreza0100/jarvis/internal/ports/interactorport"
 	runnerport "github.com/mreza0100/jarvis/internal/ports/runnerport"
+	"github.com/mreza0100/jarvis/internal/ports/terminalport"
 	"github.com/pkg/errors"
 
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
@@ -21,7 +21,7 @@ type osService struct {
 	ConfigProvider cfgport.CfgProvider
 	runner         runnerport.OSRunner
 	chat           chatport.Chat
-	interactor     interactorport.Interactor
+	terminal       terminalport.Interactor
 	history        historyport.History
 }
 
@@ -33,7 +33,7 @@ func NewOSService(req *srvport.OSServiceReq) srvport.OSService {
 		ConfigProvider: req.ConfigProvider,
 		runner:         req.Runner,
 		chat:           req.Chat,
-		interactor:     req.Interactor,
+		terminal:       req.Interactor,
 		history:        req.History,
 	}
 }
@@ -52,7 +52,7 @@ func (b *osService) initiateChat() (*models.OSReply, error) {
 	if err := b.chat.Prompt(prompt, reply); err != nil {
 		return nil, err
 	}
-	b.interactor.Reply(reply)
+	b.terminal.Reply(reply)
 
 	return reply, nil
 }
@@ -71,7 +71,7 @@ func (b *osService) RunInteractiveChat() (err error) {
 		prompt := &models.OSPrompt{Screen: b.Screen.GetScreen()}
 
 		if reply.ReplyToUser != "" {
-			b.interactor.Message(reply.ReplyToUser, b.chat.CountTokens())
+			b.terminal.PrintReply(reply.ReplyToUser, b.chat.GetRateLimitInsights())
 		}
 
 		if reply.ScriptRequest != nil {
@@ -88,7 +88,7 @@ func (b *osService) RunInteractiveChat() (err error) {
 			}
 		}
 		if reply.WaitForUserPrompt {
-			userPrompt, err := b.interactor.GetUserInput()
+			userPrompt, err := b.terminal.GetUserInput()
 			prompt.UserPrompt = &userPrompt
 			if err != nil {
 				return err
@@ -100,16 +100,16 @@ func (b *osService) RunInteractiveChat() (err error) {
 		if err := b.chat.Prompt(prompt, reply); err != nil {
 			clientErrReport := errors.Wrap(err, "Client error report: failed to process reply. Error:")
 			clientErrReportStr := clientErrReport.Error()
-			b.interactor.Error(clientErrReport)
+			b.terminal.Error(clientErrReport)
 			prompt.ClientPrompt = &clientErrReportStr
 			goto SendPrompt
 		}
-		b.interactor.Reply(reply)
+		b.terminal.Reply(reply)
 	}
 }
 
 func (b *osService) executeReplyScript(reply *models.OSReply) (*models.OSScriptResult, error) {
-	b.interactor.Script(reply.ScriptRequest)
+	b.terminal.Script(reply.ScriptRequest)
 
 	result, err := b.runner.ExecScript(reply.ScriptRequest)
 	if err != nil {
@@ -118,7 +118,7 @@ func (b *osService) executeReplyScript(reply *models.OSReply) (*models.OSScriptR
 
 	scriptResults := &models.OSScriptResult{RunnerOSResult: result}
 
-	b.interactor.ScriptResults(scriptResults)
+	b.terminal.ScriptResults(scriptResults)
 
 	return scriptResults, nil
 }

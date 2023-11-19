@@ -5,9 +5,9 @@ import (
 	"github.com/mreza0100/jarvis/internal/ports/cfgport"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/mreza0100/jarvis/internal/ports/historyport"
-	"github.com/mreza0100/jarvis/internal/ports/interactorport"
 	runnerport "github.com/mreza0100/jarvis/internal/ports/runnerport"
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
+	"github.com/mreza0100/jarvis/internal/ports/terminalport"
 	"github.com/pkg/errors"
 )
 
@@ -15,7 +15,7 @@ type pgsService struct {
 	Screen         *models.Screen
 	ConfigProvider cfgport.CfgProvider
 	runner         runnerport.PgsRunner
-	interactor     interactorport.Interactor
+	terminal       terminalport.Interactor
 	history        historyport.History
 	chat           chatport.Chat
 }
@@ -26,7 +26,7 @@ func NewPgsService(req *srvport.PgsServiceReq) srvport.PgsService {
 		ConfigProvider: req.ConfigProvider,
 		runner:         req.Runner,
 		chat:           req.Chat,
-		interactor:     req.Interactor,
+		terminal:       req.Interactor,
 		history:        req.History,
 	}
 }
@@ -44,7 +44,7 @@ func (b *pgsService) initiateChat() (*models.PgsReply, error) {
 	if err := b.chat.Prompt(prompt, reply); err != nil {
 		return nil, err
 	}
-	b.interactor.Reply(reply)
+	b.terminal.Reply(reply)
 
 	return reply, nil
 }
@@ -61,7 +61,7 @@ func (b *pgsService) RunInteractiveChat() error {
 		prompt := &models.PgsPrompt{Screen: b.Screen.GetScreen()}
 
 		if reply.ReplyToUser != "" {
-			b.interactor.Message(reply.ReplyToUser, b.chat.CountTokens())
+			b.terminal.PrintReply(reply.ReplyToUser, b.chat.GetRateLimitInsights())
 		}
 
 		if reply.QueryRequest != nil {
@@ -78,7 +78,7 @@ func (b *pgsService) RunInteractiveChat() error {
 			}
 		}
 		if reply.WaitForUserPrompt {
-			userPrompt, err := b.interactor.GetUserInput()
+			userPrompt, err := b.terminal.GetUserInput()
 			prompt.UserPrompt = &userPrompt
 			if err != nil {
 				return err
@@ -90,16 +90,16 @@ func (b *pgsService) RunInteractiveChat() error {
 		if err := b.chat.Prompt(prompt, reply); err != nil {
 			clientErrReport := errors.Wrap(err, "Client error report: failed to process reply. Error:")
 			clientErrReportStr := clientErrReport.Error()
-			b.interactor.Error(clientErrReport)
+			b.terminal.Error(clientErrReport)
 			prompt.ClientPrompt = &clientErrReportStr
 			goto SendPrompt
 		}
-		b.interactor.Reply(reply)
+		b.terminal.Reply(reply)
 	}
 }
 
 func (b *pgsService) executeReplyQuery(queryRequest *models.PgsRunnerRequest) (*models.PgsScriptResult, error) {
-	b.interactor.Script(queryRequest)
+	b.terminal.Script(queryRequest)
 
 	runnerResult, err := b.runner.ExecScript(queryRequest)
 	if err != nil {
@@ -109,7 +109,7 @@ func (b *pgsService) executeReplyQuery(queryRequest *models.PgsRunnerRequest) (*
 	scriptResults := &models.PgsScriptResult{
 		RunnerPgsResult: runnerResult,
 	}
-	b.interactor.ScriptResults(scriptResults)
+	b.terminal.ScriptResults(scriptResults)
 
 	return scriptResults, nil
 }

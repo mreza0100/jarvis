@@ -6,8 +6,8 @@ import (
 	"github.com/mreza0100/jarvis/internal/adapters/driven/chat"
 	"github.com/mreza0100/jarvis/internal/adapters/driven/config"
 	"github.com/mreza0100/jarvis/internal/adapters/driven/history"
-	"github.com/mreza0100/jarvis/internal/adapters/driven/interactor"
 	"github.com/mreza0100/jarvis/internal/adapters/driven/runners"
+	"github.com/mreza0100/jarvis/internal/adapters/driven/terminal"
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
 	pgs_srvice "github.com/mreza0100/jarvis/internal/services/pgs"
 	"github.com/urfave/cli/v2"
@@ -26,7 +26,7 @@ func (c *cmd) PgsController(ctx *cli.Context) error {
 	chat := chat.NewChat(&chat.NewChatReq{
 		ChatConfigs: configs.ConfigFile.Postgres.Config,
 	})
-	interactor := interactor.NewInteractor(interactor.InteractorReq{
+	terminal := terminal.NewInteractor(terminal.InteractorReq{
 		CfgProvider: cfgProvider,
 
 		Stdin:  os.Stdin,
@@ -39,7 +39,7 @@ func (c *cmd) PgsController(ctx *cli.Context) error {
 
 		Chat:       chat,
 		Runner:     runner,
-		Interactor: interactor,
+		Interactor: terminal,
 		History:    history,
 	})
 

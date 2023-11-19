@@ -1,4 +1,4 @@
-package interactor
+package terminal
 
 import (
 	"bufio"
@@ -9,14 +9,15 @@ import (
 	"strings"
 
 	markdown "github.com/MichaelMure/go-term-markdown"
+	"github.com/sashabaranov/go-openai"
 
 	"github.com/mreza0100/jarvis/internal/models"
 	"github.com/mreza0100/jarvis/internal/pkg/tools"
 	"github.com/mreza0100/jarvis/internal/ports/cfgport"
-	"github.com/mreza0100/jarvis/internal/ports/interactorport"
+	"github.com/mreza0100/jarvis/internal/ports/terminalport"
 )
 
-type interactor struct {
+type terminal struct {
 	mode models.Mode
 
 	stdin  io.Reader
@@ -32,8 +33,8 @@ type InteractorReq struct {
 	Stderr io.Writer
 }
 
-func NewInteractor(req InteractorReq) interactorport.Interactor {
-	return &interactor{
+func NewInteractor(req InteractorReq) terminalport.Interactor {
+	return &terminal{
 		mode: req.CfgProvider.GetConfigs().Mode,
 
 		stdin:  req.Stdin,
@@ -42,51 +43,54 @@ func NewInteractor(req InteractorReq) interactorport.Interactor {
 	}
 }
 
-func (i *interactor) GetUserInput() (string, error) {
+func (i *terminal) GetUserInput() (string, error) {
 	fmt.Print("\n==> ")
 	reader := bufio.NewReader(i.stdin)
 	userPrompt, _ := reader.ReadString('\n')
 	return strings.TrimSpace(userPrompt), nil
 }
 
-func (i *interactor) setColor(color color) {
+func (i *terminal) setColor(color color) {
 	fmt.Print(color)
 }
 
-func (i *interactor) unsetColor() {
+func (i *terminal) unsetColor() {
 	fmt.Printf("%s[%dm", "\x1b", 0)
 }
 
-func (i *interactor) log(color color, title string, message any) {
+func (i *terminal) log(color color, title string, message any) {
 	i.setColor(color)
 	defer i.unsetColor()
 
 	fmt.Printf("%s\n%+v\n", title, message)
 }
 
-func (i *interactor) logToken(color color, tokens int) {
-	i.setColor(color)
-	defer i.unsetColor()
-
-	fmt.Printf("Tokens Used: %d\n", tokens)
-}
-
-func (i *interactor) Error(err error) {
+func (i *terminal) Error(err error) {
 	i.log(colorRed, "\n", err.Error())
 }
 
-func (i *interactor) Message(message string, usedTokens int) {
+func (i *terminal) PrintReply(message string, rateLimitInsights openai.RateLimitHeaders) {
 	width, _, err := tools.GetTerminalSize()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+
 	renderedMarkdown := markdown.Render(message, width, 0)
-	i.logToken(colorYellow, usedTokens)
+
+	i.setColor(colorPurple)
+	fmt.Printf("\nLimit Requests: %v", rateLimitInsights.LimitRequests)
+	fmt.Printf(" - Limit Tokens: %v", rateLimitInsights.LimitTokens)
+	fmt.Printf(" - Remaining Requests: %v", rateLimitInsights.RemainingRequests)
+	fmt.Printf(" - Remaining Tokens: %v", rateLimitInsights.RemainingTokens)
+	fmt.Printf(" - Reset Requests: %v", rateLimitInsights.ResetRequests)
+	fmt.Printf(" - Reset Tokens: %v\n", rateLimitInsights.ResetTokens)
+	i.unsetColor()
+
 	i.log(colorCyan, "\n", string(renderedMarkdown))
 }
 
-func (i *interactor) Script(script interface{}) {
+func (i *terminal) Script(script interface{}) {
 	i.setColor(colorRed)
 	defer i.unsetColor()
 	if i.mode.IsDev() {
@@ -96,7 +100,7 @@ func (i *interactor) Script(script interface{}) {
 	}
 }
 
-func (i *interactor) ScriptResults(result interface{}) {
+func (i *terminal) ScriptResults(result interface{}) {
 	if i.mode.IsDev() {
 		jsonResult, err := json.Marshal(result)
 		if err != nil {
@@ -106,7 +110,7 @@ func (i *interactor) ScriptResults(result interface{}) {
 	}
 }
 
-func (i *interactor) Reply(reply interface{}) {
+func (i *terminal) Reply(reply interface{}) {
 	i.setColor(colorPurple)
 	defer i.unsetColor()
 	if i.mode.IsDev() {

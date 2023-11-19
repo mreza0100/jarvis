@@ -1,4 +1,4 @@
-package interactor
+package terminal
 
 type color string
 

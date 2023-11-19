@@ -3,7 +3,8 @@ package chat
 import (
 	"context"
 	"encoding/json"
-	"math"
+	"fmt"
+	"log"
 
 	"github.com/mreza0100/jarvis/internal/models"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
@@ -15,6 +16,7 @@ type chat struct {
 	config   *models.ChatConfig
 	clinet   *openai.Client
 	messages []openai.ChatCompletionMessage
+	headers  openai.RateLimitHeaders
 }
 
 type NewChatReq struct {
@@ -26,12 +28,35 @@ func NewChat(req *NewChatReq) chatport.Chat {
 		config:   req.ChatConfigs,
 		clinet:   openai.NewClient(req.ChatConfigs.GetToken()),
 		messages: make([]openai.ChatCompletionMessage, 0, 5),
+		headers:  openai.RateLimitHeaders{},
 	}
 
 	return ch
 }
 
+func (c *chat) test(rawPrompt string, replyAnswer chatport.Reply, options *chatport.PromptOptions) error {
+	ctx := context.Background()
+
+	chat, err := c.clinet.CreateChatCompletionStream(
+		ctx,
+		openai.ChatCompletionRequest{
+			Messages: c.messages,
+
+			Model:       c.config.Model,
+			Temperature: c.config.Temperature,
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	chat.GetRateLimitHeaders()
+
+	return nil
+}
+
 func (c *chat) RawPrompt(rawPrompt string, replyAnswer chatport.Reply, options *chatport.PromptOptions) error {
+	// c.test(rawPrompt, replyAnswer, options)
 	ctx := context.Background()
 
 	c.appendMessage(&openai.ChatCompletionMessage{
@@ -57,6 +82,22 @@ func (c *chat) RawPrompt(rawPrompt string, replyAnswer chatport.Reply, options *
 		Role:    openai.ChatMessageRoleAssistant,
 		Content: rawReply,
 	})
+	c.headers = chat.GetRateLimitHeaders()
+
+	switch reason := chat.Choices[0].FinishReason; reason {
+	case openai.FinishReasonStop:
+		fmt.Println("finish reason", openai.FinishReasonStop)
+	case openai.FinishReasonLength:
+		fmt.Println("finish reason", openai.FinishReasonLength)
+	case openai.FinishReasonFunctionCall:
+		fmt.Println("finish reason", openai.FinishReasonFunctionCall)
+	case openai.FinishReasonToolCalls:
+		fmt.Println("finish reason", openai.FinishReasonToolCalls)
+	case openai.FinishReasonContentFilter:
+		fmt.Println("finish reason", openai.FinishReasonContentFilter)
+	case openai.FinishReasonNull:
+		fmt.Println("finish reason", openai.FinishReasonNull)
+	}
 
 	return json.Unmarshal([]byte(rawReply), replyAnswer)
 }
@@ -78,14 +119,6 @@ func (c *chat) appendMessage(chat *openai.ChatCompletionMessage) {
 	c.messages = append(c.messages, *chat)
 }
 
-func (c *chat) CountTokens() int {
-	const tokensPer1000Chars = 1333.33
-
-	characters := 0
-	for _, m := range c.messages {
-		characters += len(m.Content)
-	}
-
-	tokens := int(math.Ceil(float64(characters) / 1000 * tokensPer1000Chars))
-	return tokens
+func (c *chat) GetRateLimitInsights() openai.RateLimitHeaders {
+	return c.headers
 }

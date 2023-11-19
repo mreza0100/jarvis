@@ -55,7 +55,7 @@ A typical configuration file looks like this:
 	"os": {
 		"config": {
 			"token": {
-				"env_name": "OPENAI_API_KEY"
+				"value": "sk-xxx"
 			},
 			"model": "gpt-4",
 			"temperature": 1
