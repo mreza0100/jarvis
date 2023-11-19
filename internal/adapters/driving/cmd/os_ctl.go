@@ -14,8 +14,8 @@ import (
 )
 
 func (c *cmd) OSController(ctx *cli.Context) error {
-	cfgProvider := config.NewConfigProvider(ctx.Args().Get(0))
-	configs := cfgProvider.GetConfigs()
+	cfgProvider := config.NewConfigProvider()
+	configs := cfgProvider.LoadConfig()
 
 	history := history.NewHistory(cfgProvider)
 

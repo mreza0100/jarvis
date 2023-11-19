@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"path"
@@ -31,22 +32,28 @@ var EmptyConfigFileSchema = &models.ConfigFile{
 
 const (
 	configDirName  = ".jarvis"
+	configFileName = ".jarvisrc.json"
 	historyDirName = "history"
 )
 
 type configProvider struct {
-	cfg            *models.Configuration
-	configFilePath string
+	cfg             *models.Configuration
+	configFilePath  string
+	hasConfigLoaded bool
 }
 
-func NewConfigProvider(path string) cfgport.CfgProvider {
+func NewConfigProvider() cfgport.CfgProvider {
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	cfg := &configProvider{
-		configFilePath: path,
+		configFilePath: path.Join(homePath, configDirName, configFileName),
 		cfg: &models.Configuration{
 			ConfigFile: &models.ConfigFile{},
 		},
 	}
-	cfg.RefreshCfg(path)
 	return cfg
 }
 
@@ -60,14 +67,42 @@ func (c *configProvider) LoadStoredFile(fileName string) (string, error) {
 	return templ, nil
 }
 
-func (c *configProvider) RefreshCfg(path string) *models.Configuration {
-	c.loadConfigFile(path)
+func (c *configProvider) BootstrapHostConfig(trunk bool) error {
+	if cfgFileExists := os.FileExists(c.configFilePath); !trunk && cfgFileExists {
+		// TODO: sortout and intgrate all the errors
+		return errors.New("A configuration file already exists. To replace the existing configuration with a new one, please rerun the command using the '--trunk' flag. This action will erase the current configuration and create a new one.")
+	}
+
+	jsonConfigSchema, err := json.MarshalIndent(EmptyConfigFileSchema, "", "	")
+	if err != nil {
+		return err
+	}
+
+	f, err := os.OpenFile(c.configFilePath, os.TruncMode)
+	if err != nil {
+		return err
+	}
+	if _, err := io.WriteString(f, string(jsonConfigSchema)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *configProvider) LoadConfig() *models.Configuration {
+	c.loadConfigFile()
 	c.setEnvConfigs()
 	c.setConstantConfigs()
+
+	c.hasConfigLoaded = true
+
 	return c.cfg
 }
 
 func (c *configProvider) GetConfigs() *models.Configuration {
+	if !c.hasConfigLoaded {
+		c.LoadConfig()
+	}
 	return c.cfg
 }
 
@@ -80,8 +115,8 @@ func (c *configProvider) setConstantConfigs() {
 	c.cfg.RootDirName = configDirName
 }
 
-func (c *configProvider) loadConfigFile(p string) {
-	cfgF, err := os.OpenFile(path.Join(p), os.ReadCreateMode)
+func (c *configProvider) loadConfigFile() {
+	cfgF, err := os.OpenFile(c.configFilePath, os.ReadCreateMode)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -91,19 +126,7 @@ func (c *configProvider) loadConfigFile(p string) {
 		log.Fatal(err)
 	}
 	if len(rawContent) == 0 {
-		jsonConfigSchema, err := json.MarshalIndent(EmptyConfigFileSchema, "", "	")
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		f, err := os.OpenFile(p, os.AppendMode)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if _, err := io.WriteString(f, string(jsonConfigSchema)); err != nil {
-			log.Fatal(err)
-		}
-		rawContent = jsonConfigSchema
+		log.Fatal("Config file does not exist or invalid. please bootstrap the config")
 	}
 	if err := json.Unmarshal(rawContent, c.cfg.ConfigFile); err != nil {
 		log.Fatal(err)

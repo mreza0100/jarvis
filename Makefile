@@ -2,7 +2,7 @@ run-interactive-os:
 	go run . interactive os
 run-interactive-pgs:
 	make pg-start
-	go run . interactive os
+	go run . interactive pgs
 
 dev-run-interactive-os:
 	export MODE="dev" && go run . interactive os

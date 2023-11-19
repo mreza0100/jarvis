@@ -26,16 +26,37 @@ func Main() {
 		Flags:       []cli.Flag{},
 	}
 
+	interactive := &cli.Command{
+		Name:        "interactive",
+		Aliases:     []string{"i"},
+		Description: "jarvis interactive terminal interactive models",
+		Subcommands: []*cli.Command{
+			pgsCliConf, osCliConf,
+		},
+	}
+
+	bootstrap := &cli.Command{
+		Name:        "bootstrap",
+		Aliases:     []string{},
+		Description: "initiate & create jarvis configuration on host",
+		Action:      handlers.BootstrapConfig,
+		Flags: []cli.Flag{&cli.BoolFlag{
+			Name:  "trunk",
+			Value: false,
+		}},
+	}
+
+	configuration := &cli.Command{
+		Name:        "config",
+		Aliases:     []string{"c"},
+		Description: "jarvis config controller root command entry",
+		Subcommands: []*cli.Command{bootstrap},
+	}
+
 	app := &cli.App{
 		Commands: []*cli.Command{
-			{
-				Name:        "interactive",
-				Aliases:     []string{"i"},
-				Description: "jarvis interactive terminal interactive models",
-				Subcommands: []*cli.Command{
-					pgsCliConf, osCliConf,
-				},
-			},
+			interactive,
+			configuration,
 		},
 	}
 
