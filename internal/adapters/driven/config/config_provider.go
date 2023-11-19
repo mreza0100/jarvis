@@ -13,9 +13,9 @@ import (
 	"github.com/mreza0100/jarvis/store/preprompts"
 )
 
-var EmptyConfigFileSchema = models.ConfigFile{
+var EmptyConfigFileSchema = &models.ConfigFile{
 	Postgres: &models.PostgresConfig{
-		Config: &models.ChatConfig{Model: "gpt-3.5-turbo-16k", Temperature: 0.7},
+		Config: &models.ChatConfig{Model: "gpt-4", Temperature: 1},
 		PostgresConnConfig: &models.PostgresConnConfig{
 			Host:     "",
 			Port:     5432,
@@ -25,7 +25,7 @@ var EmptyConfigFileSchema = models.ConfigFile{
 		},
 	},
 	OS: &models.OSConfig{
-		Config: &models.ChatConfig{Model: "gpt-3.5-turbo-16k", Temperature: 0.7},
+		Config: &models.ChatConfig{Model: "gpt-4", Temperature: 1},
 	},
 }
 
@@ -91,10 +91,11 @@ func (c *configProvider) loadConfigFile(p string) {
 		log.Fatal(err)
 	}
 	if len(rawContent) == 0 {
-		jsonConfigSchema, err := json.Marshal(EmptyConfigFileSchema)
+		jsonConfigSchema, err := json.MarshalIndent(EmptyConfigFileSchema, "", "	")
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		f, err := os.OpenFile(p, os.AppendMode)
 		if err != nil {
 			log.Fatal(err)
