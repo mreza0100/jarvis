@@ -1,7 +1,0 @@
-#!/usr/bin/bash
-
-set -e
-
-make on-push
-
-exit $?
