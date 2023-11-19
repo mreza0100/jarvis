@@ -23,7 +23,7 @@ func (c *cmd) OSController(ctx *cli.Context) error {
 	chat := chat.NewChat(&chat.NewChatReq{
 		ChatConfigs: configs.ConfigFile.OS.Config,
 	})
-	terminal := terminal.NewInteractor(terminal.InteractorReq{
+	terminal := terminal.NewTerminal(terminal.TerminalReq{
 		CfgProvider: cfgProvider,
 
 		Stdin:  os.Stdin,
@@ -34,7 +34,7 @@ func (c *cmd) OSController(ctx *cli.Context) error {
 		ConfigProvider: cfgProvider,
 		Runner:         runner,
 		Chat:           chat,
-		Interactor:     terminal,
+		Terminal:       terminal,
 		History:        history,
 	})
 

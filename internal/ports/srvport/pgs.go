@@ -12,7 +12,7 @@ type PgsServiceReq struct {
 	ConfigProvider cfgport.CfgProvider
 	Runner         runnerport.PgsRunner
 	Chat           chatport.Chat
-	Interactor     terminalport.Interactor
+	Terminal       terminalport.Terminal
 	History        historyport.History
 }
 

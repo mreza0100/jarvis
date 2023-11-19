@@ -26,7 +26,7 @@ func (c *cmd) PgsController(ctx *cli.Context) error {
 	chat := chat.NewChat(&chat.NewChatReq{
 		ChatConfigs: configs.ConfigFile.Postgres.Config,
 	})
-	terminal := terminal.NewInteractor(terminal.InteractorReq{
+	terminal := terminal.NewTerminal(terminal.TerminalReq{
 		CfgProvider: cfgProvider,
 
 		Stdin:  os.Stdin,
@@ -37,10 +37,10 @@ func (c *cmd) PgsController(ctx *cli.Context) error {
 	postgresService := pgs_srvice.NewPgsService(&srvport.PgsServiceReq{
 		ConfigProvider: cfgProvider,
 
-		Chat:       chat,
-		Runner:     runner,
-		Interactor: terminal,
-		History:    history,
+		Chat:     chat,
+		Runner:   runner,
+		Terminal: terminal,
+		History:  history,
 	})
 
 	return postgresService.RunInteractiveChat()

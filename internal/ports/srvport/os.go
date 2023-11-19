@@ -12,7 +12,7 @@ type OSServiceReq struct {
 	ConfigProvider cfgport.CfgProvider
 	Runner         runnerport.OSRunner
 	Chat           chatport.Chat
-	Interactor     terminalport.Interactor
+	Terminal       terminalport.Terminal
 	History        historyport.History
 }
 

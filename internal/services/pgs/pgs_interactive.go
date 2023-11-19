@@ -15,7 +15,7 @@ type pgsService struct {
 	Screen         *models.Screen
 	ConfigProvider cfgport.CfgProvider
 	runner         runnerport.PgsRunner
-	terminal       terminalport.Interactor
+	terminal       terminalport.Terminal
 	history        historyport.History
 	chat           chatport.Chat
 }
@@ -26,7 +26,7 @@ func NewPgsService(req *srvport.PgsServiceReq) srvport.PgsService {
 		ConfigProvider: req.ConfigProvider,
 		runner:         req.Runner,
 		chat:           req.Chat,
-		terminal:       req.Interactor,
+		terminal:       req.Terminal,
 		history:        req.History,
 	}
 }

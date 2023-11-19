@@ -25,7 +25,7 @@ type terminal struct {
 	stderr io.Writer
 }
 
-type InteractorReq struct {
+type TerminalReq struct {
 	CfgProvider cfgport.CfgProvider
 
 	Stdin  io.Reader
@@ -33,7 +33,7 @@ type InteractorReq struct {
 	Stderr io.Writer
 }
 
-func NewInteractor(req InteractorReq) terminalport.Interactor {
+func NewTerminal(req TerminalReq) terminalport.Terminal {
 	return &terminal{
 		mode: req.CfgProvider.GetConfigs().Mode,
 

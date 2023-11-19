@@ -21,7 +21,7 @@ type osService struct {
 	ConfigProvider cfgport.CfgProvider
 	runner         runnerport.OSRunner
 	chat           chatport.Chat
-	terminal       terminalport.Interactor
+	terminal       terminalport.Terminal
 	history        historyport.History
 }
 
@@ -33,7 +33,7 @@ func NewOSService(req *srvport.OSServiceReq) srvport.OSService {
 		ConfigProvider: req.ConfigProvider,
 		runner:         req.Runner,
 		chat:           req.Chat,
-		terminal:       req.Interactor,
+		terminal:       req.Terminal,
 		history:        req.History,
 	}
 }
