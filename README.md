@@ -7,7 +7,7 @@ The GPT Jarvis CLI is a powerful command-line interface powered by ChatGPT, desi
 To install the Jarvis CLI, use the following command:
 
 ```bash
-go install github.com/mreza0100/jarvis
+go install github.com/mreza0100/jarvis@latest
 ```
 
 ## Getting Started
