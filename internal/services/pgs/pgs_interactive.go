@@ -67,7 +67,14 @@ func (b *pgsService) RunInteractiveChat() error {
 		if reply.QueryRequest != nil {
 			prompt.LastQueryResult, err = b.executeReplyQuery(reply.QueryRequest)
 			if err != nil {
-				return err
+				clientPrompt := "Error detected"
+				prompt = &models.PgsPrompt{
+					ClientPrompt: &clientPrompt,
+					LastQueryResult: &models.PgsScriptResult{
+						RunnerPgsResult: &models.PgsRunnerResponse{Err: err},
+					},
+				}
+				goto SendPrompt
 			}
 		}
 		if reply.WaitForUserPrompt {

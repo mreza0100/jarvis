@@ -68,12 +68,7 @@ func (b *osService) RunInteractiveChat() (err error) {
 	for {
 		b.history.SaveReply(reply)
 
-		prompt := &models.OSPrompt{
-			Screen: b.Screen.GetScreen(),
-			LastScriptResult: &models.OSScriptResult{
-				RunnerOSResult: &models.OSRunnerResult{},
-			},
-		}
+		prompt := &models.OSPrompt{Screen: b.Screen.GetScreen()}
 
 		if reply.ReplyToUser != "" {
 			b.interactor.Message(reply.ReplyToUser, b.chat.CountTokens())
@@ -90,7 +85,6 @@ func (b *osService) RunInteractiveChat() (err error) {
 					},
 				}
 				goto SendPrompt
-				// return err
 			}
 		}
 		if reply.WaitForUserPrompt {
