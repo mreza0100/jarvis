@@ -10,12 +10,13 @@ import (
 	"github.com/mreza0100/jarvis/internal/models"
 	"github.com/mreza0100/jarvis/internal/ports/cfgport"
 	"github.com/mreza0100/jarvis/pkg/os"
-	promptstore "github.com/mreza0100/jarvis/promptstore"
+	"github.com/mreza0100/jarvis/store/preprompts"
 )
 
-var configFileEmptySchehma = models.ConfigFile{
-	PostgresConfig: models.PostgresConfig{
-		PostgresConnConfig: models.PostgresConnConfig{
+var EmptyConfigFileSchema = models.ConfigFile{
+	Postgres: &models.PostgresConfig{
+		Config: &models.ChatConfig{Model: "gpt-3.5-turbo-16k", Temperature: 0.7},
+		PostgresConnConfig: &models.PostgresConnConfig{
 			Host:     "",
 			Port:     5432,
 			Username: "",
@@ -23,20 +24,22 @@ var configFileEmptySchehma = models.ConfigFile{
 			Database: "",
 		},
 	},
+	OS: &models.OSConfig{
+		Config: &models.ChatConfig{Model: "gpt-3.5-turbo-16k", Temperature: 0.7},
+	},
 }
 
 const (
 	configDirName  = ".jarvis"
-	configFileName = "config.json"
 	historyDirName = "history"
 )
 
 type configProvider struct {
 	cfg            *models.Configuration
-	configFilePath *string
+	configFilePath string
 }
 
-func NewConfigProvider(path *string) cfgport.CfgProvider {
+func NewConfigProvider(path string) cfgport.CfgProvider {
 	cfg := &configProvider{
 		configFilePath: path,
 		cfg: &models.Configuration{
@@ -47,8 +50,8 @@ func NewConfigProvider(path *string) cfgport.CfgProvider {
 	return cfg
 }
 
-func (c *configProvider) LoadSavedFile(fileName string) (string, error) {
-	content, err := promptstore.ModelsFS.ReadFile(fileName)
+func (c *configProvider) LoadStoredFile(fileName string) (string, error) {
+	content, err := preprompts.ModelsFS.ReadFile(fileName)
 	if err != nil {
 		return "", err
 	}
@@ -57,10 +60,8 @@ func (c *configProvider) LoadSavedFile(fileName string) (string, error) {
 	return templ, nil
 }
 
-func (c *configProvider) RefreshCfg(path *string) *models.Configuration {
-	if path != nil {
-		c.loadConfigFile(*path)
-	}
+func (c *configProvider) RefreshCfg(path string) *models.Configuration {
+	c.loadConfigFile(path)
 	c.setEnvConfigs()
 	c.setConstantConfigs()
 	return c.cfg
@@ -71,7 +72,6 @@ func (c *configProvider) GetConfigs() *models.Configuration {
 }
 
 func (c *configProvider) setEnvConfigs() {
-	c.cfg.Token = os.Getenv("OPEN_API_KEY")
 	c.cfg.Mode = getModeFromEnv("MODE")
 }
 
@@ -91,7 +91,7 @@ func (c *configProvider) loadConfigFile(p string) {
 		log.Fatal(err)
 	}
 	if len(rawContent) == 0 {
-		jsonConfigSchema, err := json.Marshal(configFileEmptySchehma)
+		jsonConfigSchema, err := json.Marshal(EmptyConfigFileSchema)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -118,22 +118,19 @@ func getModeFromEnv(key string) models.Mode {
 	}
 }
 
+// const configFileName = "config.json"
 // func (c *configs) setSavedConfigs() {
 // 	homeDir, err := os.UserHomeDir()
 // 	if err != nil {
 // 		fmt.Println("Error:", err)
 // 		return
 // 	}
-
 // 	jarvisDir := path.Join(homeDir, configDirName)
-
 // 	savedConfigs := new(models.SavedConfigs)
-
 // cfgF, err := os.OpenFile(path.Join(jarvisDir, configFileName), os.ReadCreateMode)
 // if err != nil {
 // 	log.Fatal(err)
 // }
-
 // rawContent, err := io.ReadAll(cfgF)
 // if err != nil {
 // 	log.Fatal(err)

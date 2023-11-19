@@ -1,4 +1,4 @@
-package promptstore
+package preprompts
 
 import "embed"
 

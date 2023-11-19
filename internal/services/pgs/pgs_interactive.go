@@ -9,12 +9,9 @@ import (
 	runnerport "github.com/mreza0100/jarvis/internal/ports/runnerport"
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
 	"github.com/pkg/errors"
-	openai "github.com/sashabaranov/go-openai"
 )
 
 type pgsService struct {
-	clinet *openai.Client
-
 	Screen         *models.Screen
 	ConfigProvider cfgport.CfgProvider
 	runner         runnerport.PgsRunner
@@ -25,8 +22,6 @@ type pgsService struct {
 
 func NewPgsService(req *srvport.PgsServiceReq) srvport.PgsService {
 	return &pgsService{
-		clinet: openai.NewClient(req.ConfigProvider.GetConfigs().Token),
-
 		Screen:         &models.Screen{},
 		ConfigProvider: req.ConfigProvider,
 		runner:         req.Runner,
@@ -37,7 +32,7 @@ func NewPgsService(req *srvport.PgsServiceReq) srvport.PgsService {
 }
 
 func (b *pgsService) initiateChat() (*models.PgsReply, error) {
-	prePrompt, err := b.ConfigProvider.LoadSavedFile("postgres.gpt")
+	prePrompt, err := b.ConfigProvider.LoadStoredFile("postgres.gpt")
 	if err != nil {
 		return nil, err
 	}

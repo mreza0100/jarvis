@@ -10,23 +10,21 @@ import (
 	"github.com/mreza0100/jarvis/internal/adapters/driven/runners"
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
 	pgs_srvice "github.com/mreza0100/jarvis/internal/services/pgs"
-	"github.com/sashabaranov/go-openai"
 	"github.com/urfave/cli/v2"
 )
 
 func (c *cmd) PgsController(ctx *cli.Context) error {
-	configFilePath := ctx.Args().Get(0)
-	cfgProvider := config.NewConfigProvider(&configFilePath)
+	cfgProvider := config.NewConfigProvider(ctx.Args().Get(0))
 	configs := cfgProvider.GetConfigs()
 
 	history := history.NewHistory(cfgProvider)
 
 	runner := runners.NewPgsRunner(&runners.PgsRunnerReq{
-		Configs: &configs.ConfigFile.PostgresConfig.PostgresConnConfig,
+		Configs: configs.ConfigFile.Postgres.PostgresConnConfig,
 	})
 
 	chat := chat.NewChat(&chat.NewChatReq{
-		Clinet: openai.NewClient(configs.Token),
+		ChatConfigs: configs.ConfigFile.Postgres.Config,
 	})
 	interactor := interactor.NewInteractor(interactor.InteractorReq{
 		CfgProvider: cfgProvider,

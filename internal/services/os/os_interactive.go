@@ -10,13 +10,10 @@ import (
 	"github.com/mreza0100/jarvis/internal/ports/interactorport"
 	runnerport "github.com/mreza0100/jarvis/internal/ports/runnerport"
 
-	openai "github.com/sashabaranov/go-openai"
-
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
 )
 
 type osService struct {
-	clinet             *openai.Client
 	scriptCrashedTimes int
 
 	Screen         *models.Screen
@@ -29,7 +26,6 @@ type osService struct {
 
 func NewOSService(req *srvport.OSServiceReq) srvport.OSService {
 	return &osService{
-		clinet:             openai.NewClient(req.ConfigProvider.GetConfigs().Token),
 		scriptCrashedTimes: 0,
 
 		Screen:         &models.Screen{},
@@ -42,7 +38,7 @@ func NewOSService(req *srvport.OSServiceReq) srvport.OSService {
 }
 
 func (b *osService) initiateChat() (*models.OSReply, error) {
-	prePrompt, err := b.ConfigProvider.LoadSavedFile("os.gpt")
+	prePrompt, err := b.ConfigProvider.LoadStoredFile("os.gpt")
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +89,6 @@ func (b *osService) RunInteractiveChat() (err error) {
 
 	SendPrompt:
 		b.history.SavePrompt(prompt)
-		fmt.Println(prompt.Screen)
 		if err := b.chat.Prompt(prompt, reply); err != nil {
 			b.interactor.Error(err)
 			clientErrReport := "Client error report: failed to process reply. Error:" + err.Error()
