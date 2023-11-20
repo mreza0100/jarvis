@@ -69,23 +69,28 @@ func (i *terminal) Error(err error) {
 	i.log(colorRed, "\n", err.Error())
 }
 
-func (i *terminal) PrintReply(message string, rateLimitInsights openai.RateLimitHeaders) {
+func (i *terminal) printInsights(rateLimitInsights *openai.RateLimitHeaders) {
+	i.setColor(colorPurple)
+	fmt.Printf("\n")
+	fmt.Printf("Limit Tokens: %v", rateLimitInsights.LimitTokens)
+	fmt.Printf(" - Remaining Tokens: %v", rateLimitInsights.RemainingTokens)
+	fmt.Printf(" - Reset Tokens in: %v", rateLimitInsights.ResetTokens)
+	fmt.Printf("\n")
+	fmt.Printf("Limit Requests: %v", rateLimitInsights.LimitRequests)
+	fmt.Printf(" - Remaining Requests: %v", rateLimitInsights.RemainingRequests)
+	fmt.Printf(" - Reset Requests in: %v", rateLimitInsights.ResetRequests)
+	fmt.Printf("\n")
+	i.unsetColor()
+}
+
+func (i *terminal) PrintReply(message string, rateLimitInsights *openai.RateLimitHeaders) {
+	i.printInsights(rateLimitInsights)
 	width, _, err := tools.GetTerminalSize()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-
 	renderedMarkdown := markdown.Render(message, width, 0)
-
-	i.setColor(colorPurple)
-	fmt.Printf("\nLimit Requests: %v", rateLimitInsights.LimitRequests)
-	fmt.Printf(" - Limit Tokens: %v", rateLimitInsights.LimitTokens)
-	fmt.Printf(" - Remaining Requests: %v", rateLimitInsights.RemainingRequests)
-	fmt.Printf(" - Remaining Tokens: %v", rateLimitInsights.RemainingTokens)
-	fmt.Printf(" - Reset Requests: %v", rateLimitInsights.ResetRequests)
-	fmt.Printf(" - Reset Tokens: %v\n", rateLimitInsights.ResetTokens)
-	i.unsetColor()
 
 	i.log(colorCyan, "\n", string(renderedMarkdown))
 }

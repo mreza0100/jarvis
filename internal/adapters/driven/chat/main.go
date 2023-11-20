@@ -3,7 +3,6 @@ package chat
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/mreza0100/jarvis/internal/models"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
@@ -54,27 +53,27 @@ func (c *chat) RawPrompt(rawPrompt string, replyAnswer chatport.Reply, options *
 		return err
 	}
 
+	c.headers = chat.GetRateLimitHeaders()
 	rawReply := chat.Choices[0].Message.Content
 	c.appendMessage(&openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleAssistant,
 		Content: rawReply,
 	})
-	c.headers = chat.GetRateLimitHeaders()
 
-	switch reason := chat.Choices[0].FinishReason; reason {
-	case openai.FinishReasonStop:
-		fmt.Println("finish reason", openai.FinishReasonStop)
-	case openai.FinishReasonLength:
-		fmt.Println("finish reason", openai.FinishReasonLength)
-	case openai.FinishReasonFunctionCall:
-		fmt.Println("finish reason", openai.FinishReasonFunctionCall)
-	case openai.FinishReasonToolCalls:
-		fmt.Println("finish reason", openai.FinishReasonToolCalls)
-	case openai.FinishReasonContentFilter:
-		fmt.Println("finish reason", openai.FinishReasonContentFilter)
-	case openai.FinishReasonNull:
-		fmt.Println("finish reason", openai.FinishReasonNull)
-	}
+	// switch reason := chat.Choices[0].FinishReason; reason {
+	// case openai.FinishReasonStop:
+	// 	fmt.Println("finish reason", openai.FinishReasonStop)
+	// case openai.FinishReasonLength:
+	// 	fmt.Println("finish reason", openai.FinishReasonLength)
+	// case openai.FinishReasonFunctionCall:
+	// 	fmt.Println("finish reason", openai.FinishReasonFunctionCall)
+	// case openai.FinishReasonToolCalls:
+	// 	fmt.Println("finish reason", openai.FinishReasonToolCalls)
+	// case openai.FinishReasonContentFilter:
+	// 	fmt.Println("finish reason", openai.FinishReasonContentFilter)
+	// case openai.FinishReasonNull:
+	// 	fmt.Println("finish reason", openai.FinishReasonNull)
+	// }
 
 	return json.Unmarshal([]byte(rawReply), replyAnswer)
 }
@@ -96,6 +95,6 @@ func (c *chat) appendMessage(chat *openai.ChatCompletionMessage) {
 	c.messages = append(c.messages, *chat)
 }
 
-func (c *chat) GetRateLimitInsights() openai.RateLimitHeaders {
-	return c.headers
+func (c *chat) GetRateLimitInsights() *openai.RateLimitHeaders {
+	return &c.headers
 }

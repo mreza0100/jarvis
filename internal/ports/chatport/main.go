@@ -14,5 +14,5 @@ type (
 type Chat interface {
 	Prompt(prompt Prompt, replyAnswer Reply, optionsArg ...*PromptOptions) error
 	RawPrompt(rawPrompt string, replyAnswer Reply, options *PromptOptions) error
-	GetRateLimitInsights() openai.RateLimitHeaders
+	GetRateLimitInsights() *openai.RateLimitHeaders
 }
