@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/mreza0100/jarvis/internal/models"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
@@ -34,29 +33,7 @@ func NewChat(req *NewChatReq) chatport.Chat {
 	return ch
 }
 
-func (c *chat) test(rawPrompt string, replyAnswer chatport.Reply, options *chatport.PromptOptions) error {
-	ctx := context.Background()
-
-	chat, err := c.clinet.CreateChatCompletionStream(
-		ctx,
-		openai.ChatCompletionRequest{
-			Messages: c.messages,
-
-			Model:       c.config.Model,
-			Temperature: c.config.Temperature,
-		},
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	chat.GetRateLimitHeaders()
-
-	return nil
-}
-
 func (c *chat) RawPrompt(rawPrompt string, replyAnswer chatport.Reply, options *chatport.PromptOptions) error {
-	// c.test(rawPrompt, replyAnswer, options)
 	ctx := context.Background()
 
 	c.appendMessage(&openai.ChatCompletionMessage{
