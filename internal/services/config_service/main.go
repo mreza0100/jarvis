@@ -1,4 +1,4 @@
-package configs
+package config_service
 
 import "github.com/mreza0100/jarvis/internal/ports/cfgport"
 

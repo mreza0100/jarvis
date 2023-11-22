@@ -9,7 +9,7 @@ import (
 	"github.com/mreza0100/jarvis/internal/adapters/driven/runners"
 	"github.com/mreza0100/jarvis/internal/adapters/driven/terminal"
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
-	pgs_srvice "github.com/mreza0100/jarvis/internal/services/pgs"
+	interactive_service "github.com/mreza0100/jarvis/internal/services/interactive"
 	"github.com/urfave/cli/v2"
 )
 
@@ -34,7 +34,7 @@ func (c *cmd) PgsController(ctx *cli.Context) error {
 		Stderr: os.Stderr,
 	})
 
-	postgresService := pgs_srvice.NewPgsService(&srvport.PgsServiceReq{
+	postgresService := interactive_service.NewPgsService(&srvport.PgsServiceReq{
 		ConfigProvider: cfgProvider,
 
 		Chat:     chat,

@@ -7,8 +7,8 @@ run-interactive-pgs:
 dev-run-interactive-os:
 	export MODE="dev" && go run . interactive os
 dev-run-interactive-pgs:
-	export MODE="dev" && go run . interactive postgres ./configs/postgres-config.json
 	make pg-start
+	export MODE="dev" && go run . interactive postgres ./configs/postgres-config.json
 
 pg-refresh:
 	docker-compose -f tools/docker/docker-compose.yaml stop

@@ -3,8 +3,10 @@ package chat
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/mreza0100/jarvis/internal/models"
+	errs "github.com/mreza0100/jarvis/internal/pkg/errors"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/pkg/errors"
 	"github.com/sashabaranov/go-openai"
@@ -50,7 +52,19 @@ func (c *chat) RawPrompt(rawPrompt string, replyAnswer chatport.Reply, options *
 		},
 	)
 	if err != nil {
-		return err
+		e := &openai.APIError{}
+		if errs.As(err, &e) {
+			switch e.HTTPStatusCode {
+			case 401:
+				return errs.OpenAPIInvalidAuth(e.Message)
+			case 429:
+				return errs.OpenAPIRateLimit(e.Message, time.Second*5)
+			case 500:
+				return errs.OpenAPIInternalError(e.Message)
+			default:
+				return err
+			}
+		}
 	}
 
 	c.headers = chat.GetRateLimitHeaders()
@@ -59,21 +73,6 @@ func (c *chat) RawPrompt(rawPrompt string, replyAnswer chatport.Reply, options *
 		Role:    openai.ChatMessageRoleAssistant,
 		Content: rawReply,
 	})
-
-	// switch reason := chat.Choices[0].FinishReason; reason {
-	// case openai.FinishReasonStop:
-	// 	fmt.Println("finish reason", openai.FinishReasonStop)
-	// case openai.FinishReasonLength:
-	// 	fmt.Println("finish reason", openai.FinishReasonLength)
-	// case openai.FinishReasonFunctionCall:
-	// 	fmt.Println("finish reason", openai.FinishReasonFunctionCall)
-	// case openai.FinishReasonToolCalls:
-	// 	fmt.Println("finish reason", openai.FinishReasonToolCalls)
-	// case openai.FinishReasonContentFilter:
-	// 	fmt.Println("finish reason", openai.FinishReasonContentFilter)
-	// case openai.FinishReasonNull:
-	// 	fmt.Println("finish reason", openai.FinishReasonNull)
-	// }
 
 	return json.Unmarshal([]byte(rawReply), replyAnswer)
 }

@@ -1,9 +1,11 @@
-package os_srvice
+package interactive_service
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/mreza0100/jarvis/internal/models"
+	errs "github.com/mreza0100/jarvis/internal/pkg/errors"
 	"github.com/mreza0100/jarvis/internal/ports/cfgport"
 	"github.com/mreza0100/jarvis/internal/ports/chatport"
 	"github.com/mreza0100/jarvis/internal/ports/historyport"
@@ -98,7 +100,27 @@ func (b *osService) RunInteractiveChat() (err error) {
 	SendPrompt:
 		b.history.SavePrompt(prompt)
 		if err := b.chat.Prompt(prompt, reply); err != nil {
-			clientErrReport := errors.Wrap(err, "Client error report: failed to process reply. Error:")
+			e := &errs.Error{}
+			if errors.As(err, e) {
+				switch e.Code {
+				case errs.API_AUTH:
+					return err
+				case errs.API_INTERNAL_ERROR:
+					b.terminal.Error(err)
+					time.Sleep(time.Second * 3)
+					goto SendPrompt
+				case errs.API_RATE_LIMIT:
+					waitDuration, ok := e.Data["wait"].(time.Duration)
+					if !ok {
+						return errors.New("cast failed, e.Params[1].(time.Duration)")
+					}
+					b.terminal.Error(errors.Wrapf(err, "retrying in %s", waitDuration.String()))
+					time.Sleep(waitDuration)
+					goto SendPrompt
+				}
+			}
+
+			clientErrReport := errors.Wrap(err, "Client error report: failed to process reply")
 			clientErrReportStr := clientErrReport.Error()
 			b.terminal.Error(clientErrReport)
 			prompt.ClientPrompt = &clientErrReportStr

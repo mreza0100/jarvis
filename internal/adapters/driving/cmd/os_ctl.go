@@ -9,7 +9,7 @@ import (
 	"github.com/mreza0100/jarvis/internal/adapters/driven/runners"
 	"github.com/mreza0100/jarvis/internal/adapters/driven/terminal"
 	"github.com/mreza0100/jarvis/internal/ports/srvport"
-	os_srvice "github.com/mreza0100/jarvis/internal/services/os"
+	interactive_service "github.com/mreza0100/jarvis/internal/services/interactive"
 	"github.com/urfave/cli/v2"
 )
 
@@ -30,7 +30,7 @@ func (c *cmd) OSController(ctx *cli.Context) error {
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 	})
-	bootSrv := os_srvice.NewOSService(&srvport.OSServiceReq{
+	bootSrv := interactive_service.NewOSService(&srvport.OSServiceReq{
 		ConfigProvider: cfgProvider,
 		Runner:         runner,
 		Chat:           chat,
