@@ -59,102 +59,110 @@ Certainly! Here's the updated section of the `technical.md` document for the GPT
 
 ### Communication Protocols: OS and PostgreSQL Schemas
 
+Certainly! Here's a cleaner and more readable version of the OS and PostgreSQL schemas for the `technical.md` document:
+
+### Communication Protocols: OS and PostgreSQL Schemas
+
 #### OS Schema
 
-The OS interaction uses a JSON-based communication protocol. The structure for this communication is as follows:
+The OS interaction uses a JSON-based communication protocol. Below are the structured formats:
 
 **OS Reply JSON Structure:**
 
 ```json
 {
-  "ReplyToUser": "null|string",
-  "WaitForUserPrompt": "boolean",
-  "Script": "null|{
-    \"Runtime\": \"string\",
-    \"Script\": \"string\"
-  }"
+  "ReplyToUser": null | string,
+  "WaitForUserPrompt": boolean,
+  "Script": {
+    "Runtime": string,
+    "Script": string
+  } | null
 }
 ```
 
-- `ReplyToUser`: Used to communicate with the user, parsing as markdown. It should be concise and direct.
-- `WaitForUserPrompt`: Set to true if a response from the user is needed.
-- `Script`: Contains the script to be executed on the host, including the runtime and script content.
+- `ReplyToUser`: Communicates with the user, outputting as markdown. Should be concise.
+- `WaitForUserPrompt`: Set to true to request a user response.
+- `Script`: Contains script to be executed, including the runtime environment and script text.
 
 **OS Prompt JSON Structure:**
 
 ```json
 {
-  "ClientPrompt": "null|string",
-  "UserPrompt": "null|string",
-  "Screen": "null|{
-    \"Width\": \"number\",
-    \"Height\": \"number\"
-  }",
-  "LastScriptResult": "null|{
-    \"Stdout\": \"string\",
-    \"Stderr\": \"string\",
-    \"StatusCode\": \"int\"
-  }"
+  "ClientPrompt": null | string,
+  "UserPrompt": null | string,
+  "Screen": {
+    "Width": number,
+    "Height": number
+  } | null,
+  "LastScriptResult": {
+    "Stdout": string,
+    "Stderr": string,
+    "StatusCode": int
+  } | null
 }
 ```
 
-- `ClientPrompt`: Message from the client running program to GPT.
-- `UserPrompt`: Direct user's prompt to GPT.
-- `Screen`: Information about the user's screen size.
-- `LastScriptResult`: Results of the last executed script, including standard output, error, and status code.
+- `ClientPrompt`: Message from the client program to GPT.
+- `UserPrompt`: Direct user prompt to GPT.
+- `Screen`: Information about user's screen dimensions.
+- `LastScriptResult`: Details of the last executed script, including output, errors, and status code.
 
 #### PostgreSQL Schema
 
-The PostgreSQL interaction also uses a JSON format for communication:
+The PostgreSQL interaction also follows a JSON-based communication format:
 
 **PostgreSQL Reply JSON Structure:**
 
 ```json
 {
-  "ReplyToUser": "null|string",
-  "WaitForUserPrompt": "boolean",
-  "QueryRequest": "null|{
-    \"Query\": \"string\"
-  }"
+  "ReplyToUser": null | string,
+  "WaitForUserPrompt": boolean,
+  "QueryRequest": {
+    "Query": string
+  } | null
 }
 ```
 
-- `ReplyToUser`: Used for communicating with the user in markdown format.
-- `WaitForUserPrompt`: Indicates whether to wait for a user prompt.
-- `QueryRequest`: Contains the SQL query to be executed.
+- `ReplyToUser`: Communicates with the user in markdown format.
+- `WaitForUserPrompt`: True if the system should wait for user input.
+- `QueryRequest`: Contains SQL query to be executed.
 
 **PostgreSQL Prompt JSON Structure:**
 
 ```json
 {
-  "ClientPrompt": "null|string",
-  "UserPrompt": "null|string",
-  "Screen": "null|{
-    \"Width\": \"number\",
-    \"Height\": \"number\"
-  }",
-  "LastQueryResult": "null|{
-    \"QueryResponses\": \"[{
-      \"ColumnValues\": \"[any]\",
-      \"Columns\": \"[string]\",
-      \"ColumnType\": \"[{
-        \"Name\": \"string\",
-        \"Length\": \"null|int64\",
-        \"Nullable\": \"null|bool\",
-        \"DatabaseTypeName\": \"string\"
-      }]\",
-      \"Err\": \"error\"
-    }]\"
-  }"
+  "ClientPrompt": null | string,
+  "UserPrompt": null | string,
+  "Screen": {
+    "Width": number,
+    "Height": number
+  } | null,
+  "LastQueryResult": {
+    "QueryResponses": [
+      {
+        "ColumnValues": [any],
+        "Columns": [string],
+        "ColumnType": [
+          {
+            "Name": string,
+            "Length": int | null,
+            "Nullable": bool | null,
+            "DatabaseTypeName": string
+          }
+        ],
+        "Err": error
+      }
+    ]
+  } | null
 }
 ```
 
-- `ClientPrompt`: Message from the client running program.
-- `UserPrompt`: Direct user's prompt.
-- `Screen`: Screen size information.
-- `LastQueryResult`: Results from the last executed query, including column values, types, and any errors.
+- `ClientPrompt`: Message from the client program.
+- `UserPrompt`: Direct user prompt.
+- `Screen`: Screen size details.
+- `LastQueryResult`: Results of the last executed query, including response details and any errors.
 
-These JSON structures define the exact format in which the GPT Jarvis CLI system communicates with the OpenAI API for OS and PostgreSQL functionalities, ensuring structured and consistent interactions.
+These JSON structures define the communication format for the GPT Jarvis CLI system when interacting with the OpenAI API for OS and PostgreSQL functionalities, ensuring clear and structured interactions.
 
 ### Challenges of Using OpenAI API
 
