@@ -69,7 +69,7 @@ The OS interaction uses a JSON-based communication protocol. Below are the struc
 
 **OS Reply JSON Structure:**
 
-```json
+```ts
 {
   "ReplyToUser": null | string,
   "WaitForUserPrompt": boolean,
@@ -86,7 +86,7 @@ The OS interaction uses a JSON-based communication protocol. Below are the struc
 
 **OS Prompt JSON Structure:**
 
-```json
+```ts
 {
   "ClientPrompt": null | string,
   "UserPrompt": null | string,
@@ -113,7 +113,7 @@ The PostgreSQL interaction also follows a JSON-based communication format:
 
 **PostgreSQL Reply JSON Structure:**
 
-```json
+```ts
 {
   "ReplyToUser": null | string,
   "WaitForUserPrompt": boolean,
@@ -129,7 +129,7 @@ The PostgreSQL interaction also follows a JSON-based communication format:
 
 **PostgreSQL Prompt JSON Structure:**
 
-```json
+```ts
 {
   "ClientPrompt": null | string,
   "UserPrompt": null | string,
