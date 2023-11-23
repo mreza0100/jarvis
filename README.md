@@ -1,4 +1,4 @@
-# Commented README.md for GPT Jarvis CLI
+# GPT Jarvis CLI
 
 The GPT Jarvis CLI is a powerful command-line interface powered by ChatGPT, designed for sophisticated tasks in your terminal.
 
@@ -88,6 +88,27 @@ jarvis interactive postgres
 - `config bootstrap`: Initializes and sets up the configuration file. Use `--trunk` to overwrite existing configurations.
 
 Ensure your API token and connection details are correctly set in `.jarvisrc.json` before using Jarvis.
+
+## How to Communicate with Jarvis
+
+To effectively interact with Jarvis, users should follow a clear and precise communication approach. Here are some guidelines:
+
+1. **Step-by-Step Commands**: Break down your tasks into step-by-step commands. Jarvis operates best with specific, sequential instructions.
+
+2. **Explicit Instructions**: Clearly state what you want Jarvis to do. Avoid ambiguity in your commands.
+
+3. **Example Commands**:
+
+      - **Docker Example**: "Do not ask for permissions. Show all the docker containers, then perform a health check on each of them, restart and retrieve the unhealthy or stopped ones."
+      - **PostgreSQL Example**: "Do not ask for permissions. Fetch all the existing tables and their structure, then perform a performance check on each table based on the 'created_at' column. Optimize the query and run the performance check again to see the difference. Use any tool to maximize performance."
+
+4. **Planning the Task**: If you're unsure how to accomplish a task, you can ask Jarvis to plan the steps. For example, "Plan the steps to optimize the database query based on the 'created_at' column."
+
+5. **Using Specific Commands**: If you prefer a specific command or tool, instruct Jarvis accordingly. For instance, "Use the 'docker ps -a' command to list all Docker containers."
+
+6. **Permissions and Safety**: Jarvis is designed to follow safety protocols. If a task requires elevated permissions or could potentially impact system stability, consider adding safety checks or confirmations.
+
+7. **Continuous Interaction**: Jarvis may require additional information or clarification. Be prepared to provide further details or confirmations to complete the task effectively.
 
 # Examples
 
