@@ -187,7 +187,7 @@ This revised document reflects the latest developments and plans for the GPT Jar
                           │                                                                  │  │             │
                           ├──────────────────────┐                  ┌──────────────────────┐ │  │             │
                           │    Config Provider   │                  │   Terminal Adapter   ├─┘  │             │
-                          │                      │                  │                      │    │             │
+                          │        Adapter       │                  │                      │    │             │
                           │                      │                  │                      │    │             │
                           │                      ◄─────────┬────────►Renders Markdown      │    │             │
                           │Config Control        │         │        │Read                  │    │             │
