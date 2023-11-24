@@ -4,7 +4,6 @@ type OSReply struct {
 	ReplyToUser       string           `json:"ReplyToUser"`
 	WaitForUserPrompt bool             `json:"WaitForUserPrompt"`
 	ScriptRequest     *OSRunnerRequest `json:"Script"`
-	TokensUsed        int              `json:"_"`
 }
 
 type OSRunnerRequest struct {

@@ -34,62 +34,23 @@ func NewPgsService(req *srvport.PgsServiceReq) srvport.PgsService {
 	}
 }
 
-func (b *pgsService) initiateChat() (*models.PgsReply, error) {
-	prePrompt, err := b.ConfigProvider.LoadStoredFile("postgres.gpt")
-	if err != nil {
-		return nil, err
-	}
-	prompt := &models.PgsPrompt{
-		ClientPrompt: &prePrompt,
-	}
-	b.history.SavePrompt(prompt)
-	reply := new(models.PgsReply)
-	if err := b.chat.Prompt(prompt, reply); err != nil {
-		return nil, err
-	}
-	b.terminal.Reply(reply)
-
-	return reply, nil
-}
-
 // TODO: Refactor this and os, both RunInteractiveChat methods must connect to the same struct
 // TODO: Also decuple blocks, break them into functions and set there data in the state of the struct, so the helper common methods in that struct can change the state of the loop
 // TODO: State values: waitForUser, Executing and etc, also state needs to containt the prompt, answer and other data
 func (b *pgsService) RunInteractiveChat() error {
-	reply, err := b.initiateChat()
+	prePrompt, err := b.ConfigProvider.LoadStoredFile("postgres.gpt")
 	if err != nil {
 		return err
 	}
 
+	reply := new(models.PgsReply)
+	prompt := &models.PgsPrompt{
+		ClientPrompt: &prePrompt,
+		Screen:       b.Screen.GetScreen(),
+	}
+
 	for {
-		b.history.SaveReply(reply)
-
-		prompt := &models.PgsPrompt{Screen: b.Screen.GetScreen()}
-
-		if reply.ReplyToUser != "" {
-			b.terminal.PrintReply(reply.ReplyToUser, b.chat.GetRateLimitInsights())
-		}
-
-		if reply.QueryRequest != nil {
-			prompt.LastQueryResult, err = b.executeReplyQuery(reply.QueryRequest)
-			if err != nil {
-				clientPrompt := "Error detected"
-				prompt = &models.PgsPrompt{
-					ClientPrompt: &clientPrompt,
-					LastQueryResult: &models.PgsScriptResult{
-						RunnerPgsResult: &models.PgsRunnerResponse{Err: err},
-					},
-				}
-				goto SendPrompt
-			}
-		}
-		if reply.WaitForUserPrompt {
-			userPrompt, err := b.terminal.GetUserInput()
-			prompt.UserPrompt = &userPrompt
-			if err != nil {
-				return err
-			}
-		}
+		b.history.SavePrompt(prompt)
 
 	SendPrompt:
 		b.history.SavePrompt(prompt)
@@ -118,13 +79,39 @@ func (b *pgsService) RunInteractiveChat() error {
 				}
 			}
 
-			clientErrReport := errors.Wrap(err, "Client error report: failed to process reply")
+			clientErrReport := errors.Wrap(err, "Client error report: failed to process reply or parse json, reason:")
 			clientErrReportStr := clientErrReport.Error()
 			b.terminal.Error(clientErrReport)
 			prompt.ClientPrompt = &clientErrReportStr
 			goto SendPrompt
 		}
+		b.history.SaveReply(reply)
 		b.terminal.Reply(reply)
+
+		if reply.ReplyToUser != "" {
+			b.terminal.PrintReply(reply.ReplyToUser, b.chat.GetRateLimitInsights())
+		}
+
+		if reply.QueryRequest != nil {
+			prompt.LastQueryResult, err = b.executeReplyQuery(reply.QueryRequest)
+			if err != nil {
+				clientPrompt := "Error detected"
+				prompt = &models.PgsPrompt{
+					ClientPrompt: &clientPrompt,
+					LastQueryResult: &models.PgsScriptResult{
+						RunnerPgsResult: &models.PgsRunnerResponse{Err: err},
+					},
+				}
+				goto SendPrompt
+			}
+		}
+		if reply.WaitForUserPrompt {
+			userPrompt, err := b.terminal.GetUserInput()
+			prompt.UserPrompt = &userPrompt
+			if err != nil {
+				return err
+			}
+		}
 	}
 }
 

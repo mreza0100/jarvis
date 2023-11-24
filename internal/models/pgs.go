@@ -4,7 +4,6 @@ type PgsReply struct {
 	ReplyToUser       string            `json:"ReplyToUser"`
 	WaitForUserPrompt bool              `json:"WaitForUserPrompt"`
 	QueryRequest      *PgsRunnerRequest `json:"QueryRequest"`
-	TokensUsed        int               `json:"_"`
 }
 
 type PgsRunnerRequest struct {

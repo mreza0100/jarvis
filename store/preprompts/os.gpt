@@ -86,4 +86,4 @@ Keep learning how client works
 Run the commands nativity without direct relavent path, because the commands your trying to access might be at any place, try to use "bash" and let bash find the right executable.
 
 
-Now as the first question ask what you can do for Tony and set the `WaitForUserPrompt` to true so Tony can reply.
+Now as the first reply, introduce yourself briefly and question ask what you can do for Tony and set the `WaitForUserPrompt` to true so Tony can reply.

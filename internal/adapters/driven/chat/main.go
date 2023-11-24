@@ -46,6 +46,9 @@ func (c *chat) RawPrompt(rawPrompt string, replyAnswer chatport.Reply, options *
 		ctx,
 		openai.ChatCompletionRequest{
 			Messages: c.messages,
+			ResponseFormat: &openai.ChatCompletionResponseFormat{
+				Type: openai.ChatCompletionResponseFormatTypeJSONObject,
+			},
 
 			Model:       c.config.Model,
 			Temperature: c.config.Temperature,
