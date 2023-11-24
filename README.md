@@ -1,3 +1,11 @@
+<!-- ![DALL·E 2023-11-24 00 56 29 - A modern and sleek logo design for a project called 'GPT Jarvis CLI'  The logo should incorporate elements that represent command-line interfaces, art](https://github.com/mreza0100/jarvis/assets/59161329/aeba7e2b-abd6-4bd5-b708-8f4729ac6ff2) -->
+
+<p align="center">
+	<img src="https://github.com/mreza0100/jarvis/assets/59161329/9e0c06fa-50b6-4c09-bd84-8f08301ece3b" height="350" width="450">
+</p>
+
+
+
 # GPT Jarvis CLI
 
 The GPT Jarvis CLI is a powerful command-line interface powered by ChatGPT, designed for sophisticated tasks in your terminal.
