@@ -170,7 +170,7 @@ Challenges include managing API rate limits, balancing cost and usage, ensuring 
 
 This revised document reflects the latest developments and plans for the GPT Jarvis CLI system, providing a comprehensive overview of its architecture, features, and challenges.
 
-## Diagram
+## Diagram of Internal Components
 
 ```
 ┌──────────────────┐   ┌──────────────────────┐       ┌──────────────────┐     ┌───────────────────┐
