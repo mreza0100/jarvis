@@ -1,6 +1,7 @@
 <p align="center">
-	<img src="https://github.com/mreza0100/jarvis/assets/59161329/9e0c06fa-50b6-4c09-bd84-8f08301ece3b" height="350" width="450">
+	<img src="https://github.com/mreza0100/jarvis/assets/59161329/e1b49e56-e4a1-46b6-8437-9ddea69a5abb" height="400" width="800">
 </p>
+
 
 # GPT Jarvis CLI
 
